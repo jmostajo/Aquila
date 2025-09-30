@@ -4,6 +4,42 @@ from fonts_embed import _embed_font_css
 
 _embed_font_css()
 
+# ===========================
+# 2) FORZAR TEMA OSCURO CRÍTICO
+# ===========================
+DARK_THEME_CSS = """
+<style>
+:root {
+  color-scheme: dark !important;
+}
+
+html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"], .main {
+  background-color: #0F1721 !important;
+  color: #F8FAFC !important;
+  transition: none !important;
+}
+
+div, section, header, main, aside, nav {
+  background-color: transparent !important;
+}
+
+section[data-testid="stSidebar"] {
+  background-color: #1A2332 !important;
+}
+
+.stApp {
+  background: linear-gradient(135deg, #0F1721 0%, #1A2332 100%) !important;
+}
+
+[data-testid="stAppViewContainer"] > div:first-child {
+  background-color: #0F1721 !important;
+}
+</style>
+"""
+
+st.markdown(DARK_THEME_CSS, unsafe_allow_html=True)
+
+
 import numpy as np
 import pandas as pd
 from io import BytesIO
