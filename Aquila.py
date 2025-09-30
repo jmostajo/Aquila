@@ -219,7 +219,12 @@ def _first_existing(paths):
 
 RESOLVED_LOGO = _first_existing(LOGO_CANDIDATES)
 PAGE_ICON = str(RESOLVED_LOGO) if RESOLVED_LOGO else "📊"
-st.set_page_config(page_title="Aquila — Análisis de Riesgo Crediticio", page_icon=PAGE_ICON, layout="wide")
+st.set_page_config(
+    page_title="Aquila — Análisis de Riesgo Crediticio",
+    page_icon=PAGE_ICON,
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 st.markdown("<style>.material-icons, .material-icons-outlined{display:none!important;}</style>", unsafe_allow_html=True)
 
 @st.cache_data(show_spinner=False)
@@ -254,29 +259,93 @@ pio.templates.default = "curay"
 
 css = """
 <style>
-:root { --primary:#0C1B2A; --accent:#CBA135; --success:#18B277; --danger:#E05F5F; --text:#F8FAFC; --text-muted:#94A3B8; --bg:#0F1721; }
-.stApp{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:linear-gradient(135deg,#0F1721 0%,#1A2332 100%);color:var(--text);}
-[data-testid="stToolbar"],[data-testid="stDecoration"],[data-testid="stStatusWidget"]{display:none;}
-.main .block-container{padding-top:1.5rem;max-width:1400px;}
-.exec-kpi{background:linear-gradient(135deg,rgba(255,255,255,0.06) 0%,rgba(255,255,255,0.02) 100%);border:1px solid rgba(255,255,255,0.12);
-  border-radius:16px;padding:1.8rem 1.5rem;backdrop-filter:blur(10px);transition:transform .2s, box-shadow .2s;}
-.exec-kpi:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3);}
-.kpi-label{font-size:.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;font-weight:600;}
-.kpi-value{font-size:2.8rem;font-weight:800;color:var(--text);line-height:1;margin-bottom:.5rem;}
-.decision-hero{background:linear-gradient(135deg,rgba(203,161,53,0.15) 0%,rgba(203,161,53,0.05) 100%);border:2px solid rgba(203,161,53,0.4);
-  border-radius:24px;padding:3rem 2rem;margin:2.5rem 0;text-align:center;backdrop-filter:blur(12px);}
-.decision-result{font-size:3.5rem;font-weight:900;margin:1.5rem 0;text-transform:uppercase;letter-spacing:.03em;}
-.decision-accept{color:var(--success);text-shadow:0 0 30px rgba(24,178,119,0.6);animation:pulse-accept 2s ease-in-out infinite;}
-.decision-reject{color:var(--danger);text-shadow:0 0 30px rgba(224,95,95,0.6);animation:pulse-reject 2s ease-in-out infinite;}
-@keyframes pulse-accept{0%,100%{opacity:1;}50%{opacity:.8;}} @keyframes pulse-reject{0%,100%{opacity:1;}50%{opacity:.8;}}
-.stNumberInput>div>div>input{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:var(--text);font-size:1rem;}
-.stSlider{padding:1rem 0;}
-.stButton>button[kind="primary"]{background:linear-gradient(135deg,var(--accent) 0%,#D4B15F 100%);color:var(--primary);border:none;border-radius:12px;
-  padding:.9rem 2.5rem;font-size:1.1rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;box-shadow:0 4px 20px rgba(203,161,53,0.4);transition:all .3s;}
-.stButton>button[kind="primary"]:hover{transform:translateY(-2px);box-shadow:0 6px 30px rgba(203,161,53,0.6);}
-.section-header{font-size:1.4rem;font-weight:700;color:var(--text);margin:2rem 0 1rem 0;padding-bottom:.5rem;border-bottom:2px solid rgba(203,161,53,0.3);}
-[data-testid="stMetricValue"]{font-size:2rem;font-weight:700;}
-@media (max-width:768px){.kpi-value{font-size:2rem;}.decision-result{font-size:2.5rem;}.decision-hero{padding:2rem 1rem;}}
+/* ---------- FIXED LAYOUT: same look on all browsers ---------- */
+:root{
+  --sidebar-w: 300px;        /* fixed sidebar width */
+  --content-w: 1280px;       /* fixed central content width */
+  --content-max: 1400px;     /* optional cap for very large screens */
+  --bg:#0F1721; --text:#F8FAFC; --text-muted:#94A3B8;
+  --primary:#0C1B2A; --accent:#CBA135; --success:#18B277; --danger:#E05F5F;
+}
+
+/* Don’t collapse below our design width — show horizontal scroll instead */
+html, body { min-width: calc(var(--sidebar-w) + var(--content-w) + 60px); }
+
+/* Sidebar: fixed width */
+section[data-testid="stSidebar"]{
+  min-width: var(--sidebar-w) !important;
+  max-width: var(--sidebar-w) !important;
+}
+
+/* Main content: fixed width, centered */
+.main .block-container{
+  max-width: var(--content-w) !important;
+  min-width: var(--content-w) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-top: 1.5rem !important;
+}
+
+/* On very large monitors, allow a gentle cap while keeping look */
+@media (min-width: 1700px){
+  .main .block-container{
+    max-width: var(--content-max) !important;
+    min-width: var(--content-max) !important;
+  }
+}
+
+/* Keep headings and widgets from jumping around */
+h1, h2, h3, h4, h5, h6 { line-height: 1.2; }
+.stSlider, .stNumberInput, .stButton, .stMetric { box-sizing: border-box; }
+
+/* Your original theme bits (safe to keep) */
+.stApp{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background: linear-gradient(135deg,#0F1721 0%,#1A2332 100%);
+  color: var(--text);
+}
+[data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"]{ display:none; }
+
+.exec-kpi{
+  background: linear-gradient(135deg,rgba(255,255,255,0.06) 0%,rgba(255,255,255,0.02) 100%);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:16px; padding:1.8rem 1.5rem; backdrop-filter:blur(10px);
+  transition:transform .2s, box-shadow .2s;
+}
+.exec-kpi:hover{ transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.3); }
+.kpi-label{ font-size:.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:.75rem; font-weight:600; }
+.kpi-value{ font-size:2.8rem; font-weight:800; color:var(--text); line-height:1; margin-bottom:.5rem; }
+
+.decision-hero{
+  background:linear-gradient(135deg,rgba(203,161,53,0.15) 0%,rgba(203,161,53,0.05) 100%);
+  border:2px solid rgba(203,161,53,0.4); border-radius:24px; padding:3rem 2rem; margin:2rem 0; text-align:center;
+}
+.decision-result{ font-size:3.5rem; font-weight:900; margin:1.5rem 0; text-transform:uppercase; letter-spacing:.03em; }
+.decision-accept{ color:var(--success); text-shadow:0 0 30px rgba(24,178,119,0.6); }
+.decision-reject{ color:var(--danger); text-shadow:0 0 30px rgba(224,95,95,0.6); }
+
+/* Optional: slightly scale down on Windows 125% zoom to fit better */
+@media (min-width: 1200px){
+  .main .block-container{ transform-origin: top center; }
+}
+
+/* Keep metrics and buttons tidy */
+[data-testid="stMetricValue"]{ font-size:2rem; font-weight:700; }
+.stButton>button[kind="primary"]{
+  background:linear-gradient(135deg,var(--accent) 0%,#D4B15F 100%);
+  color:var(--primary); border:none; border-radius:12px;
+  padding:.9rem 2.5rem; font-size:1.1rem; font-weight:700; letter-spacing:.05em;
+  box-shadow:0 4px 20px rgba(203,161,53,0.4); transition:all .3s;
+}
+.stButton>button[kind="primary"]:hover{ transform:translateY(-2px); box-shadow:0 6px 30px rgba(203,161,53,0.6); }
+.section-header{ font-size:1.4rem; font-weight:700; color:var(--text); margin:2rem 0 1rem; padding-bottom:.5rem; border-bottom:2px solid rgba(203,161,53,0.3); }
+
+/* Keep mobile tweaks minimal (you can delete if you prefer exact desktop look) */
+@media (max-width: 768px){
+  .kpi-value{ font-size:2rem; }
+  .decision-result{ font-size:2.5rem; }
+  .decision-hero{ padding:2rem 1rem; }
+}
 </style>
 """
 st.markdown(css, unsafe_allow_html=True)
