@@ -653,19 +653,6 @@ else:
     st.success(f"🟢 **Bajo Riesgo** (Calificación: {score:.1f})")
 st.success("✅ Paso 4 completado: Calificación de riesgo definida")
 
-with st.expander("📋 Resumen de Datos para el Análisis"):
-    col_d1, col_d2, col_d3 = st.columns(3)
-    with col_d1:
-        st.write(f"**Cliente:** {cliente}")
-        st.write(f"**Calificación:** {score:.2f}")
-    with col_d2:
-        st.write(f"**Exposición (EAD):** {fmt_usd(EAD_sel)}")
-        st.write(f"**Garantías (editable):** {fmt_usd(garantias_sel)}")
-    with col_d3:
-        st.write(f"**Tasa Anual:** {st.session_state['tc_ann_applied']*100:.2f}%")
-        st.write(f"**Gastos:** {fmt_usd(gastos_sel)}")
-        st.write(f"**Umbral Retorno:** {RET_THRESHOLD*100:.0f}%")
-
 # Paso 5: Ejecutar análisis
 st.markdown("---")
 st.markdown("### 🎯 Paso 5: Ejecutar Análisis de Riesgo")
