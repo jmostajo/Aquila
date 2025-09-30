@@ -35,19 +35,6 @@ section[data-testid="stSidebar"] {
   background-color: #0F1721 !important;
 }
 </style>
-/* Fix para expander overlay */
-[data-testid="stExpander"] {
-  isolation: isolate !important;
-  z-index: 1 !important;
-}
-
-.streamlit-expanderHeader {
-  overflow: hidden !important;
-  background: rgba(255,255,255,0.03) !important;
-}
-
-.streamlit-expanderHeader p,
-.streamlit-expanderHeader div {
   overflow: hidden !important;
   white-space: nowrap !important;
   text-overflow: ellipsis !important;
@@ -848,4 +835,3 @@ with col_info2:
 with col_info3:
     if "last_analysis_time" in st.session_state:
         st.caption(f"**Último análisis:** {st.session_state['last_analysis_time']}")
-# CSS fix applied
