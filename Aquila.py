@@ -814,3 +814,4 @@ with col_info2:
 with col_info3:
     if "last_analysis_time" in st.session_state:
         st.caption(f"**Último análisis:** {st.session_state['last_analysis_time']}")
+# CSS fix applied
