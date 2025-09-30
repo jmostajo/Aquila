@@ -1,0 +1,132 @@
+import java.util.Arrays; //aquí lo que estamos haciendo es importar el paquete de java utilies arrays 
+
+public class Main { //clase pública
+
+    // Método para calcular la varianza del flujo de caja neto
+    public static double calcularVarianza(double[] flujoCajaNeto) {
+        double suma = 0.0;
+        double media = 0.0;
+        
+        // Calcula la media
+        for (double d : flujoCajaNeto) {
+            suma += d;
+        }
+        media = suma / flujoCajaNeto.length;
+
+        // Calcula la varianza
+        double varianza = 0.0;
+        for (double d : flujoCajaNeto) {
+            varianza += Math.pow(d - media, 2);
+        }
+        return varianza / flujoCajaNeto.length;
+    }
+
+    // Método para calcular el suavizado exponencial simple
+    public static double[] suavizadoExponencial(double[] flujoCajaNeto, double alpha) {
+        double[] suavizado = new double[flujoCajaNeto.length];
+        suavizado[0] = flujoCajaNeto[0]; // El primer valor es igual al flujo inicial
+
+        // Aplica el suavizado exponencial para el resto de los valores
+        for (int i = 1; i < flujoCajaNeto.length; i++) {
+            suavizado[i] = alpha * flujoCajaNeto[i] + (1 - alpha) * suavizado[i - 1];
+        }
+        return suavizado;
+    }
+
+    public static void main(String[] args) {
+        // Ejemplo de datos de flujo de caja neto desde el 06/03/2025 hasta el 21/03/2025
+        double[] flujoCajaNeto = {
+            -456354.35, -279758.75, 73009.70, 264582.00, 0.00, 0.00, 
+            -859927.96, 157632.34, -127513.24, 261715.06, 3300.73, 1996641.34
+        };
+
+        // Calcular la varianza
+        double varianza = calcularVarianza(flujoCajaNeto);
+        System.out.println("La varianza del flujo de caja neto es: " + varianza);
+
+        // Realizar el suavizado exponencial simple
+        double alpha = 0.2; // Valor de alpha (puedes ajustarlo según sea necesario)
+        double[] flujoSuavizado = suavizadoExponencial(flujoCajaNeto, alpha);
+
+        // Mostrar los resultados del suavizado exponencial
+        System.out.println("Flujo de caja neto suavizado: ");
+        System.out.println(Arrays.toString(flujoSuavizado));
+    }
+}cd src
+import java.util.Arrays;
+
+public class Main {
+
+    // Método para calcular la varianza del flujo de caja neto
+    public static double calcularVarianza(double[] flujoCajaNeto) {
+        double suma = 0.0;
+        double media = 0.0;
+
+        // Calcula la media
+        for (double d : flujoCajaNeto) {
+            suma += d;
+        }
+        media = suma / flujoCajaNeto.length;
+
+        // Calcula la varianza
+        double varianza = 0.0;
+        for (double d : flujoCajaNeto) {
+            varianza += Math.pow(d - media, 2);
+        }
+        return varianza / flujoCajaNeto.length;
+    }
+
+    // Método para calcular el suavizado exponencial simple
+    public static double[] suavizadoExponencial(double[] flujoCajaNeto, double alpha) {
+        double[] suavizado = new double[flujoCajaNeto.length];
+        suavizado[0] = flujoCajaNeto[0]; // El primer valor es igual al flujo inicial
+
+        // Aplica el suavizado exponencial para el resto de los valores
+        for (int i = 1; i < flujoCajaNeto.length; i++) {
+            suavizado[i] = alpha * flujoCajaNeto[i] + (1 - alpha) * suavizado[i - 1];
+        }
+        return suavizado;
+    }
+
+    public static void main(String[] args) {
+        // Ejemplo de datos de flujo de caja neto desde el 06/03/2025 hasta el 21/03/2025
+        double[] flujoCajaNeto = {
+            -456354.35, -279758.75, 73009.70, 264582.00, 0.00, 0.00, 
+            -859927.96, 157632.34, -127513.24, 261715.06, 3300.73, 1996641.34
+        };
+
+        // Calcular la varianza
+        double varianza = calcularVarianza(flujoCajaNeto);
+        System.out.println("La varianza del flujo de caja neto es: " + varianza);
+
+        // Realizar el suavizado exponencial simple
+        double alpha = 0.2; // Valor de alpha (puedes ajustarlo según sea necesario)
+        double[] flujoSuavizado = suavizadoExponencial(flujoCajaNeto, alpha);
+
+        // Mostrar los resultados del suavizado exponencial
+        System.out.println("Flujo de caja neto suavizado: ");
+        System.out.println(Arrays.toString(flujoSuavizado));
+    }
+}
+
+javac Main.java
+java Main
+
+pwd
+
+
+^x
+
+^X
+
+
+
+cd..
+
+
+
+
+
+
+
+
