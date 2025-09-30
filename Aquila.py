@@ -243,7 +243,7 @@ AUTHOR_TAG = f"© {datetime.now().year} · {AUTHOR_NAME}"
 SLOGAN_LINE = "Análisis de Riesgo Crediticio Inteligente"
 
 # === Constantes y helpers ===
-APP_VERSION = "6.5-AQ"
+APP_VERSION = "6.6-AQ"
 CO_ANUAL_FIJO = 0.015
 TM_ANUAL_FIJO = 0.0075
 PD12_ANCLA_1, PD12_ANCLA_5 = 0.80, 0.05
