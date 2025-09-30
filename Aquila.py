@@ -35,6 +35,23 @@ section[data-testid="stSidebar"] {
   background-color: #0F1721 !important;
 }
 </style>
+/* Fix para expander overlay */
+[data-testid="stExpander"] {
+  isolation: isolate !important;
+  z-index: 1 !important;
+}
+
+.streamlit-expanderHeader {
+  overflow: hidden !important;
+  background: rgba(255,255,255,0.03) !important;
+}
+
+.streamlit-expanderHeader p,
+.streamlit-expanderHeader div {
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+}
 """
 
 st.markdown(DARK_THEME_CSS, unsafe_allow_html=True)
@@ -387,6 +404,23 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.2; }
   .decision-hero{ padding:2rem 1rem; }
 }
 </style>
+/* Fix para expander overlay */
+[data-testid="stExpander"] {
+  isolation: isolate !important;
+  z-index: 1 !important;
+}
+
+.streamlit-expanderHeader {
+  overflow: hidden !important;
+  background: rgba(255,255,255,0.03) !important;
+}
+
+.streamlit-expanderHeader p,
+.streamlit-expanderHeader div {
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+}
 """
 st.markdown(css, unsafe_allow_html=True)
 
