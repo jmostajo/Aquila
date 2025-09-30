@@ -11,31 +11,24 @@ DARK_THEME_CSS = """
 <style>
 :root {
   color-scheme: dark !important;
-}
 
 html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"], .main {
   background-color: #0F1721 !important;
   color: #F8FAFC !important;
   transition: none !important;
-}
 
 div, section, header, main, aside, nav {
   background-color: transparent !important;
-}
 
 section[data-testid="stSidebar"] {
   background-color: #1A2332 !important;
-}
 
 .stApp {
   background: linear-gradient(135deg, #0F1721 0%, #1A2332 100%) !important;
-}
 
 [data-testid="stAppViewContainer"] > div:first-child {
   background-color: #0F1721 !important;
-}
 </style>
-}
 """
 
 st.markdown(DARK_THEME_CSS, unsafe_allow_html=True)
@@ -307,7 +300,6 @@ css = """
   --content-max: 1400px;     /* optional cap for very large screens */
   --bg:#0F1721; --text:#F8FAFC; --text-muted:#94A3B8;
   --primary:#0C1B2A; --accent:#CBA135; --success:#18B277; --danger:#E05F5F;
-}
 
 /* Don’t collapse below our design width — show horizontal scroll instead */
 html, body { min-width: calc(var(--sidebar-w) + var(--content-w) + 60px); }
@@ -316,7 +308,6 @@ html, body { min-width: calc(var(--sidebar-w) + var(--content-w) + 60px); }
 section[data-testid="stSidebar"]{
   min-width: var(--sidebar-w) !important;
   max-width: var(--sidebar-w) !important;
-}
 
 /* Main content: fixed width, centered */
 .main .block-container{
@@ -325,15 +316,12 @@ section[data-testid="stSidebar"]{
   margin-left: auto !important;
   margin-right: auto !important;
   padding-top: 1.5rem !important;
-}
 
 /* On very large monitors, allow a gentle cap while keeping look */
 @media (min-width: 1700px){
   .main .block-container{
     max-width: var(--content-max) !important;
     min-width: var(--content-max) !important;
-  }
-}
 
 /* Keep headings and widgets from jumping around */
 h1, h2, h3, h4, h5, h6 { line-height: 1.2; }
@@ -344,7 +332,6 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.2; }
   font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   background: linear-gradient(135deg,#0F1721 0%,#1A2332 100%);
   color: var(--text);
-}
 [data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"]{ display:none; }
 
 .exec-kpi{
@@ -352,7 +339,6 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.2; }
   border:1px solid rgba(255,255,255,0.12);
   border-radius:16px; padding:1.8rem 1.5rem; backdrop-filter:blur(10px);
   transition:transform .2s, box-shadow .2s;
-}
 .exec-kpi:hover{ transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.3); }
 .kpi-label{ font-size:.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; margin-bottom:.75rem; font-weight:600; }
 .kpi-value{ font-size:2.8rem; font-weight:800; color:var(--text); line-height:1; margin-bottom:.5rem; }
@@ -360,7 +346,6 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.2; }
 .decision-hero{
   background:linear-gradient(135deg,rgba(203,161,53,0.15) 0%,rgba(203,161,53,0.05) 100%);
   border:2px solid rgba(203,161,53,0.4); border-radius:24px; padding:3rem 2rem; margin:2rem 0; text-align:center;
-}
 .decision-result{ font-size:3.5rem; font-weight:900; margin:1.5rem 0; text-transform:uppercase; letter-spacing:.03em; }
 .decision-accept{ color:var(--success); text-shadow:0 0 30px rgba(24,178,119,0.6); }
 .decision-reject{ color:var(--danger); text-shadow:0 0 30px rgba(224,95,95,0.6); }
@@ -368,7 +353,6 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.2; }
 /* Optional: slightly scale down on Windows 125% zoom to fit better */
 @media (min-width: 1200px){
   .main .block-container{ transform-origin: top center; }
-}
 
 /* Keep metrics and buttons tidy */
 [data-testid="stMetricValue"]{ font-size:2rem; font-weight:700; }
@@ -377,7 +361,6 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.2; }
   color:var(--primary); border:none; border-radius:12px;
   padding:.9rem 2.5rem; font-size:1.1rem; font-weight:700; letter-spacing:.05em;
   box-shadow:0 4px 20px rgba(203,161,53,0.4); transition:all .3s;
-}
 .stButton>button[kind="primary"]:hover{ transform:translateY(-2px); box-shadow:0 6px 30px rgba(203,161,53,0.6); }
 .section-header{ font-size:1.4rem; font-weight:700; color:var(--text); margin:2rem 0 1rem; padding-bottom:.5rem; border-bottom:2px solid rgba(203,161,53,0.3); }
 
@@ -386,9 +369,7 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.2; }
   .kpi-value{ font-size:2rem; }
   .decision-result{ font-size:2.5rem; }
   .decision-hero{ padding:2rem 1rem; }
-}
 </style>
-}
 """
 st.markdown(css, unsafe_allow_html=True)
 
