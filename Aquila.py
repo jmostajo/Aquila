@@ -1,5 +1,9 @@
 from __future__ import annotations
 import streamlit as st
+from fonts_embed import _embed_font_css
+
+_embed_font_css()
+
 import numpy as np
 import pandas as pd
 from io import BytesIO
