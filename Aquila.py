@@ -763,7 +763,7 @@ with col_edit1:
         "Garantía Bruta (USD) — Columna I",
         min_value=0.0,
         value=float(garantia_bruta_base),
-        step=10_000.0,  # Incrementos de $10,000
+        step=10_000.0,
         format="%.0f",
         help="Valor de la garantía del cliente. Usa +/- para ajustar"
     )
@@ -774,7 +774,7 @@ with col_edit2:
         min_value=0.0,
         max_value=1.0,
         value=float(peso_garantia_base),
-        step=0.01,  # Incrementos de 1%
+        step=0.01,
         format="%.2f",
         help="Factor de calidad del colateral (0 a 1). Usa +/- para ajustar"
     )
@@ -782,35 +782,48 @@ with col_edit2:
 # Calcular garantía castigada con valores editados
 garantia_castigada = garantia_bruta_edit * peso_garantia_edit
 
-# Mostrar resultados
+# Mostrar resultados con KPI Cards
+st.markdown('<div class="kpi-wrap">', unsafe_allow_html=True)
+
 col_res1, col_res2, col_res3 = st.columns(3)
 
 with col_res1:
     delta_bruta = garantia_bruta_edit - garantia_bruta_base
-    st.metric(
-        "Garantía Bruta (editada)",
-        fmt_usd(garantia_bruta_edit, 0),
-        delta=fmt_usd(delta_bruta, 0) if delta_bruta != 0 else None
+    delta_text = f"Base: {fmt_usd(garantia_bruta_base, 0)}"
+    st.markdown(
+        f'''<div class="kpi-card">
+            <div class="kpi-title">Garantía Bruta (editada)</div>
+            <div class="kpi-val">{fmt_usd(garantia_bruta_edit, 0)}</div>
+            <div class="kpi-sub">{delta_text}</div>
+        </div>''',
+        unsafe_allow_html=True
     )
 
 with col_res2:
     delta_peso = peso_garantia_edit - peso_garantia_base
-    st.metric(
-        "Peso de Garantía (editado)",
-        f"{peso_garantia_edit:.2%}",
-        delta=f"{delta_peso:+.2%}" if delta_peso != 0 else None
+    delta_text_peso = f"Base: {peso_garantia_base:.2%}"
+    st.markdown(
+        f'''<div class="kpi-card">
+            <div class="kpi-title">Peso de Garantía (editado)</div>
+            <div class="kpi-val">{peso_garantia_edit:.2%}</div>
+            <div class="kpi-sub">{delta_text_peso}</div>
+        </div>''',
+        unsafe_allow_html=True
     )
 
 with col_res3:
-    st.metric(
-        "Garantía Castigada (Final)",
-        fmt_usd(garantia_castigada, 0),
-        help="Garantía Bruta × Peso = Valor efectivo en default"
+    st.markdown(
+        f'''<div class="kpi-card">
+            <div class="kpi-title">Garantía Castigada (Final)</div>
+            <div class="kpi-val">{fmt_usd(garantia_castigada, 0)}</div>
+            <div class="kpi-sub">Bruta × Peso</div>
+        </div>''',
+        unsafe_allow_html=True
     )
 
-st.success("✅ Paso 6 completado: Garantías castigadas calculadas")
+st.markdown('</div>', unsafe_allow_html=True)  # cierre kpi-wrap
 
-# Fórmula
+st.success("✅ Paso 6 completado: Garantías castigadas calculadas")
 st.caption(f"**Fórmula:** {fmt_usd(garantia_bruta_edit, 0)} × {peso_garantia_edit:.2%} = {fmt_usd(garantia_castigada, 0)}")
 # deploy Tue Sep 30 23:49:06 UTC 2025
 
