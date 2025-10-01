@@ -607,25 +607,26 @@ else:
 
 # Paso 3: Tasa
 # Paso 3: Tasa
+# Paso 3: Tasa
 st.markdown("---")
 st.markdown("### 🧮 Paso 3: Configurar Tasa Compensatoria")
 
 col_calc1, col_calc2, col_calc3 = st.columns([2, 2, 1])
 
 with col_calc1:
-    tasa_anual_input = st.number_input(
-        "Tasa Compensatoria Anual (decimal)",
-        min_value=0.0, max_value=2.0,
-        value=0.3449, step=0.01, format="%.4f",
-        help="Ejemplo: 0.3449 = 34.49% anual"
+    tasa_m_input = st.number_input(
+        "Tasa Compensatoria Mensual (decimal)",
+        min_value=0.0, max_value=0.20,
+        value=0.025, step=0.001, format="%.4f",
+        help="Ejemplo: 0.025 = 2.50% mensual"
     )
 
 with col_calc2:
-    tasa_mensual_equiv = to_monthly(tasa_anual_input)
+    tasa_anual_calc = to_annual_from_monthly(tasa_m_input)
     st.metric(
-        "Equivalente Mensual", 
-        f"{tasa_mensual_equiv*100:.4f}%",
-        help=f"Tasa efectiva mensual: {tasa_mensual_equiv:.6f}"
+        "Equivalente Anual", 
+        f"{tasa_anual_calc*100:.2f}%",
+        help=f"Tasa efectiva anual: {tasa_anual_calc:.6f}"
     )
 
 with col_calc3:
@@ -633,9 +634,9 @@ with col_calc3:
     aplicar_tasa = st.button("✅ Aplicar", key="apply_calc", use_container_width=True, type="primary")
 
 if aplicar_tasa:
-    st.session_state["tc_ann_applied"] = tasa_anual_input
+    st.session_state["tc_ann_applied"] = tasa_anual_calc
     st.session_state["tasa_aplicada"] = True
-    st.success(f"✅ Paso 3 completado: Tasa anual {tasa_anual_input*100:.2f}% aplicada para los cálculos")
+    st.success(f"✅ Paso 3 completado: Tasa anual {tasa_anual_calc*100:.2f}% aplicada para los cálculos")
 
 if not st.session_state.get("tasa_aplicada", False):
     st.warning("⏳ Haga clic en '✅ Aplicar' para continuar al siguiente paso")
