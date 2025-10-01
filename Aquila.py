@@ -739,6 +739,56 @@ if analizar:
         )
     
     st.markdown('</div>', unsafe_allow_html=True)  # cierre kpi-wrap
+  # Paso 6: Castigar garantías
+st.markdown("---")
+st.markdown("### 🛡️ Paso 6: Castigar Garantías en Caso de Default Definitivo")
+
+# Leer garantía bruta de columna I (índice 8)
+try:
+    garantia_bruta = float(row.iloc[8])  # Columna I
+except Exception:
+    garantia_bruta = 0.0
+    st.warning("⚠️ No se pudo leer la garantía bruta de la columna I")
+
+# Leer peso de garantía de columna M (índice 12)
+try:
+    peso_garantia = leer_peso_garantia_colM(row)  # Ya tienes esta función
+except Exception:
+    peso_garantia = 1.0
+    st.warning("⚠️ No se pudo leer el peso de la garantía de la columna M")
+
+# Calcular garantía castigada
+garantia_castigada = garantia_bruta * peso_garantia
+
+# Mostrar resultados en 3 columnas
+col_g1, col_g2, col_g3 = st.columns(3)
+
+with col_g1:
+    st.metric(
+        "Garantía Bruta (Col. I)",
+        fmt_usd(garantia_bruta, 0),
+        help="Valor original de la garantía del cliente"
+    )
+
+with col_g2:
+    st.metric(
+        "Peso de Garantía (Col. M)",
+        f"{peso_garantia:.2%}",
+        help="Factor de ajuste por calidad del colateral"
+    )
+
+with col_g3:
+    st.metric(
+        "Garantía Castigada",
+        fmt_usd(garantia_castigada, 0),
+        delta=f"-{fmt_usd(garantia_bruta - garantia_castigada, 0)}",
+        help="Garantía × Peso = Valor efectivo en default"
+    )
+
+st.success("✅ Paso 6 completado: Garantías castigadas calculadas")
+
+# Opcional: Mostrar fórmula
+st.caption(f"**Fórmula:** {fmt_usd(garantia_bruta, 0)} × {peso_garantia:.2%} = {fmt_usd(garantia_castigada, 0)}")
 # deploy Tue Sep 30 23:49:06 UTC 2025
 
 # deploy 2025-10-01T01:45:23Z
