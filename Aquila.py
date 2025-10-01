@@ -696,7 +696,7 @@ if analizar:
         st.markdown(
             f'''<div class="exec-kpi"><div class="kpi-label">Probabilidad de Default</div>
                 <div class="kpi-value">{resultado["PD_12m"]*100:.1f}%</div>
-                <div class="kpi-context">Próximos 12 meses</div></div>''',
+                <div class="kpi-context">Probabilidad de 12 meses</div></div>''',
             unsafe_allow_html=True
         )
     with kpi2:
@@ -805,3 +805,5 @@ with col_info3:
     if "last_analysis_time" in st.session_state:
         st.caption(f"**Último análisis:** {st.session_state['last_analysis_time']}")
 # deploy Tue Sep 30 23:49:06 UTC 2025
+
+# deploy 2025-10-01T01:45:23Z
