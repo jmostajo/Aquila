@@ -770,7 +770,7 @@ col_edit1, col_edit2 = st.columns(2)
 
 with col_edit1:
     garantia_bruta_edit = st.number_input(
-        "Garantía Bruta (USD) — Columna I",
+        "Garantía Bruta (Valor Realizable) (USD) — Columna I",
         min_value=0.0,
         value=float(garantia_bruta_base),
         step=10_000.0,
@@ -780,7 +780,7 @@ with col_edit1:
 
 with col_edit2:
     peso_garantia_edit = st.number_input(
-        "Peso de Garantía — Columna M",
+        "Peso de Garantía (Quality Collateral) — Columna M",
         min_value=0.0,
         max_value=1.0,
         value=float(peso_garantia_base),
