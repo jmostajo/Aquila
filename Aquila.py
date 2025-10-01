@@ -804,7 +804,7 @@ with col_res2:
     delta_text_peso = f"Base: {peso_garantia_base:.2%}"
     st.markdown(
         f'''<div class="kpi-card">
-            <div class="kpi-title">Peso de Garantía (editado)</div>
+            <div class="kpi-title">Peso de Garantía (Quality Collateral)</div>
             <div class="kpi-val">{peso_garantia_edit:.2%}</div>
             <div class="kpi-sub">{delta_text_peso}</div>
         </div>''',
