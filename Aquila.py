@@ -741,7 +741,7 @@ if analizar:
     st.markdown('</div>', unsafe_allow_html=True)  # cierre kpi-wrap
   # Paso 6: Castigar garantías
 st.markdown("---")
-st.markdown("### 🛡️ Paso 6: Castigar Garantías en Caso de Default Definitivo")
+st.markdown("### 🛡️ Paso 6: Castigar Garantías Solo en Caso de Default Definitivo")
 
 # Leer garantía bruta de columna I (índice 8)
 try:
