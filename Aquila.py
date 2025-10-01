@@ -611,7 +611,7 @@ st.markdown("### 🧮 Paso 3: Configurar Tasa Compensatoria")
 
 # Selector de tipo de tasa
 tipo_tasa = st.radio(
-    "Seleccione el tipo de tasa a ingresar:",
+    "Seleccione el tipo de tasa a ingresar y luego haga click en Aplicar:",
     ["Tasa Anual", "Tasa Mensual"],
     horizontal=True,
     help="Elija si desea ingresar la tasa en términos anuales o mensuales"
