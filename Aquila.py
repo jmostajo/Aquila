@@ -691,38 +691,54 @@ if analizar:
 
     st.markdown("---")
     st.markdown("### 📈 Métricas Clave del Análisis")
+    
+    # Usar el contenedor kpi-wrap con kpi-card
+    st.markdown('<div class="kpi-wrap">', unsafe_allow_html=True)
+    
     kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+    
     with kpi1:
         st.markdown(
-            f'''<div class="exec-kpi"><div class="kpi-label">Probabilidad de Default</div>
-                <div class="kpi-value">{resultado["PD_12m"]*100:.1f}%</div>
-                <div class="kpi-context">Probabilidad de 12 meses</div></div>''',
+            f'''<div class="kpi-card">
+                <div class="kpi-title">Probabilidad de Default</div>
+                <div class="kpi-val">{resultado["PD_12m"]*100:.2f}%</div>
+                <div class="kpi-sub">Probabilidad de 12 meses</div>
+            </div>''',
             unsafe_allow_html=True
         )
+    
     with kpi2:
         st.markdown(
-            f'''<div class="exec-kpi"><div class="kpi-label">Pérdida por Default</div>
-                <div class="kpi-value">{round(resultado["LGD"]*100, 2):.2f}%</div>
-                <div class="kpi-context">LGD (Loss Given Default)</div></div>''',
+            f'''<div class="kpi-card">
+                <div class="kpi-title">Pérdida por Default (LGD)</div>
+                <div class="kpi-val">{resultado["LGD"]*100:.2f}%</div>
+                <div class="kpi-sub">Loss Given Default</div>
+            </div>''',
             unsafe_allow_html=True
         )
+    
     with kpi3:
         st.markdown(
-            f'''<div class="exec-kpi"><div class="kpi-label">Pérdida Esperada</div>
-                <div class="kpi-value">{fmt_usd(resultado["ECL"],2)}</div>
-                <div class="kpi-context">Expected Credit Loss</div></div>''',
+            f'''<div class="kpi-card">
+                <div class="kpi-title">Pérdida Esperada (ECL)</div>
+                <div class="kpi-val">{fmt_usd(resultado["ECL"], 0)}</div>
+                <div class="kpi-sub">Expected Credit Loss</div>
+            </div>''',
             unsafe_allow_html=True
         )
+    
     with kpi4:
+        delta_class = "up" if decision_ok else "down"
         st.markdown(
-            f'''<div class="exec-kpi"><div class="kpi-label">Retorno Esperado</div>
-                <div class="kpi-value" style="color: {'var(--success)' if decision_ok else 'var(--danger)'};">
-                    {resultado["RE_anual_simple"]*100:.2f}%</div>
-                <div class="kpi-context">Umbral: {RET_THRESHOLD*100:.0f}%</div></div>''',
+            f'''<div class="kpi-card">
+                <div class="kpi-title">Retorno Esperado</div>
+                <div class="kpi-val">{resultado["RE_anual_simple"]*100:.2f}%</div>
+                <div class="kpi-sub">Umbral: <span class="kpi-delta {delta_class}">{RET_THRESHOLD*100:.0f}%</span></div>
+            </div>''',
             unsafe_allow_html=True
         )
-
-  
+    
+    st.markdown('</div>', unsafe_allow_html=True)  # cierre kpi-wrap
 # deploy Tue Sep 30 23:49:06 UTC 2025
 
 # deploy 2025-10-01T01:45:23Z
