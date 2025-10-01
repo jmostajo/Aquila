@@ -740,55 +740,78 @@ if analizar:
     
     st.markdown('</div>', unsafe_allow_html=True)  # cierre kpi-wrap
   # Paso 6: Castigar garantías
+# Paso 6: Castigar garantías (EDITABLE)
 st.markdown("---")
-st.markdown("### 🛡️ Paso 6: Castigar Garantías Solo en Caso de Default Definitivo")
+st.markdown("### 🛡️ Paso 6: Castigar Garantías en Caso de Default Definitivo")
 
-# Leer garantía bruta de columna I (índice 8)
+# Leer valores base del Excel
 try:
-    garantia_bruta = float(row.iloc[8])  # Columna I
+    garantia_bruta_base = float(row.iloc[8])  # Columna I
 except Exception:
-    garantia_bruta = 0.0
-    st.warning("⚠️ No se pudo leer la garantía bruta de la columna I")
+    garantia_bruta_base = 0.0
 
-# Leer peso de garantía de columna M (índice 12)
 try:
-    peso_garantia = leer_peso_garantia_colM(row)  # Ya tienes esta función
+    peso_garantia_base = leer_peso_garantia_colM(row)  # Columna M
 except Exception:
-    peso_garantia = 1.0
-    st.warning("⚠️ No se pudo leer el peso de la garantía de la columna M")
+    peso_garantia_base = 1.0
 
-# Calcular garantía castigada
-garantia_castigada = garantia_bruta * peso_garantia
+# Inputs editables con +/- 
+col_edit1, col_edit2 = st.columns(2)
 
-# Mostrar resultados en 3 columnas
-col_g1, col_g2, col_g3 = st.columns(3)
-
-with col_g1:
-    st.metric(
-        "Garantía Bruta (Col. I)",
-        fmt_usd(garantia_bruta, 0),
-        help="Valor original de la garantía del cliente"
+with col_edit1:
+    garantia_bruta_edit = st.number_input(
+        "Garantía Bruta (USD) — Columna I",
+        min_value=0.0,
+        value=float(garantia_bruta_base),
+        step=10_000.0,  # Incrementos de $10,000
+        format="%.0f",
+        help="Valor de la garantía del cliente. Usa +/- para ajustar"
     )
 
-with col_g2:
-    st.metric(
-        "Peso de Garantía (Col. M)",
-        f"{peso_garantia:.2%}",
-        help="Factor de ajuste por calidad del colateral"
+with col_edit2:
+    peso_garantia_edit = st.number_input(
+        "Peso de Garantía — Columna M",
+        min_value=0.0,
+        max_value=1.0,
+        value=float(peso_garantia_base),
+        step=0.01,  # Incrementos de 1%
+        format="%.2f",
+        help="Factor de calidad del colateral (0 a 1). Usa +/- para ajustar"
     )
 
-with col_g3:
+# Calcular garantía castigada con valores editados
+garantia_castigada = garantia_bruta_edit * peso_garantia_edit
+
+# Mostrar resultados
+col_res1, col_res2, col_res3 = st.columns(3)
+
+with col_res1:
+    delta_bruta = garantia_bruta_edit - garantia_bruta_base
     st.metric(
-        "Garantía Castigada",
+        "Garantía Bruta (editada)",
+        fmt_usd(garantia_bruta_edit, 0),
+        delta=fmt_usd(delta_bruta, 0) if delta_bruta != 0 else None
+    )
+
+with col_res2:
+    delta_peso = peso_garantia_edit - peso_garantia_base
+    st.metric(
+        "Peso de Garantía (editado)",
+        f"{peso_garantia_edit:.2%}",
+        delta=f"{delta_peso:+.2%}" if delta_peso != 0 else None
+    )
+
+with col_res3:
+    st.metric(
+        "Garantía Castigada (Final)",
         fmt_usd(garantia_castigada, 0),
-        delta=f"-{fmt_usd(garantia_bruta - garantia_castigada, 0)}",
-        help="Garantía × Peso = Valor efectivo en default"
+        help="Garantía Bruta × Peso = Valor efectivo en default"
     )
 
 st.success("✅ Paso 6 completado: Garantías castigadas calculadas")
 
-# Opcional: Mostrar fórmula
-st.caption(f"**Fórmula:** {fmt_usd(garantia_bruta, 0)} × {peso_garantia:.2%} = {fmt_usd(garantia_castigada, 0)}")
+# Fórmula
+st.caption(f"**Fórmula:** {fmt_usd(garantia_bruta_edit, 0)} × {peso_garantia_edit:.2%} = {fmt_usd(garantia_castigada, 0)}")
 # deploy Tue Sep 30 23:49:06 UTC 2025
 
 # deploy 2025-10-01T01:45:23Z
