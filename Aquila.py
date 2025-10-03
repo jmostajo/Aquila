@@ -24,7 +24,7 @@ from PIL import Image
 from string import Template
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-import base64  # <-- añadido para el logo
+import base64  # for logo encoding
 
 _embed_font_css()
 
@@ -33,187 +33,95 @@ _embed_font_css()
 # ===========================
 DARK_THEME_CSS = """
 <style>
-:root {
-  color-scheme: dark !important;
-}
-
+:root { color-scheme: dark !important; }
 html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"], .main {
-  background-color: #0F1721 !important;
-  color: #F8FAFC !important;
-  transition: none !important;
+  background-color: #0F1721 !important; color: #F8FAFC !important; transition: none !important;
 }
-
-div, section, header, main, aside, nav {
-  background-color: transparent !important;
-}
-
+div, section, header, main, aside, nav { background-color: transparent !important; }
 section[data-testid="stSidebar"] {
   background: linear-gradient(180deg, #1A2332 0%, #0F1721 100%) !important;
   border-right: 1px solid rgba(96, 165, 250, 0.1) !important;
 }
-
-.stApp {
-  background: radial-gradient(ellipse at top, #1e3a5f 0%, #0F1721 50%, #0a0f1a 100%) !important;
-}
-
-[data-testid="stAppViewContainer"] > div:first-child {
-  background-color: transparent !important;
-}
+.stApp { background: radial-gradient(ellipse at top, #1e3a5f 0%, #0F1721 50%, #0a0f1a 100%) !important; }
+[data-testid="stAppViewContainer"] > div:first-child { background-color: transparent !important; }
 
 /* Animated gradient background effect */
-@keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
+@keyframes gradient-shift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 .stApp::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, 
-    rgba(96, 165, 250, 0.03) 0%, 
-    rgba(167, 139, 250, 0.03) 25%,
-    rgba(244, 114, 182, 0.03) 50%,
-    rgba(96, 165, 250, 0.03) 75%,
+  content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(45deg,
+    rgba(96, 165, 250, 0.03) 0%, rgba(167, 139, 250, 0.03) 25%,
+    rgba(244, 114, 182, 0.03) 50%, rgba(96, 165, 250, 0.03) 75%,
     rgba(167, 139, 250, 0.03) 100%);
-  background-size: 400% 400%;
-  animation: gradient-shift 15s ease infinite;
-  pointer-events: none;
-  z-index: 0;
+  background-size: 400% 400%; animation: gradient-shift 15s ease infinite;
+  pointer-events: none; z-index: 0;
 }
 
-/* Enhanced metric cards */
+/* Cards */
 .metric-card {
   background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 33, 0.9) 100%);
-  border: 1px solid rgba(96, 165, 250, 0.2);
-  border-radius: 16px;
-  padding: 1.5rem;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
+  border: 1px solid rgba(96, 165, 250, 0.2); border-radius: 16px; padding: 1.5rem;
+  backdrop-filter: blur(20px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden;
 }
+.metric-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, #60A5FA, #A78BFA, #F472B6); opacity: 0; transition: opacity 0.3s ease; }
+.metric-card:hover::before { opacity: 1; }
+.metric-card:hover { transform: translateY(-4px); border-color: rgba(96, 165, 250, 0.4);
+  box-shadow: 0 12px 48px rgba(96, 165, 250, 0.2); }
 
-.metric-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #60A5FA, #A78BFA, #F472B6);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.metric-card:hover::before {
-  opacity: 1;
-}
-
-.metric-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(96, 165, 250, 0.4);
-  box-shadow: 0 12px 48px rgba(96, 165, 250, 0.2);
-}
-
-/* Enhanced input fields */
+/* Inputs */
 .stNumberInput input, .stSelectbox select {
-  background: rgba(15, 23, 33, 0.6) !important;
-  border: 1px solid rgba(96, 165, 250, 0.2) !important;
-  border-radius: 10px !important;
-  color: #F8FAFC !important;
-  padding: 0.75rem !important;
-  transition: all 0.3s ease !important;
+  background: rgba(15, 23, 33, 0.6) !important; border: 1px solid rgba(96, 165, 250, 0.2) !important;
+  border-radius: 10px !important; color: #F8FAFC !important; padding: 0.75rem !important; transition: all 0.3s ease !important;
 }
-
 .stNumberInput input:focus, .stSelectbox select:focus {
-  border-color: rgba(96, 165, 250, 0.5) !important;
-  box-shadow: 0 0 20px rgba(96, 165, 250, 0.15) !important;
+  border-color: rgba(96, 165, 250, 0.5) !important; box-shadow: 0 0 20px rgba(96, 165, 250, 0.15) !important;
 }
 
-/* Enhanced slider */
+/* Slider */
 .stSlider [data-baseweb="slider"] {
-  background: linear-gradient(to right, 
-    rgb(239, 68, 68) 0%, 
-    rgb(251, 146, 60) 25%, 
-    rgb(234, 179, 8) 50%, 
-    rgb(132, 204, 22) 75%, 
-    rgb(34, 197, 94) 100%) !important;
-  height: 8px !important;
-  border-radius: 10px !important;
+  background: linear-gradient(to right, rgb(239,68,68), rgb(251,146,60), rgb(234,179,8), rgb(132,204,22), rgb(34,197,94)) !important;
+  height: 8px !important; border-radius: 10px !important;
 }
 
-/* Enhanced buttons */
+/* Buttons */
 .stButton button {
-  font-weight: 600 !important;
-  letter-spacing: 0.05em !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+  font-weight: 600 !important; letter-spacing: 0.05em !important; transition: all 0.3s cubic-bezier(0.4,0,0.2,1) !important;
+  border-radius: 12px !important; box-shadow: 0 4px 20px rgba(0,0,0,0.2) !important;
 }
+.stButton button:hover { transform: translateY(-2px) !important; box-shadow: 0 6px 30px rgba(96,165,250,0.3) !important; }
 
-.stButton button:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 30px rgba(96, 165, 250, 0.3) !important;
-}
-
-/* Section headers with gradient underline */
+/* Section headers */
 .section-header-enhanced {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #F8FAFC;
-  margin: 2.5rem 0 1.5rem;
-  padding-bottom: 0.75rem;
-  position: relative;
+  font-size: 1.8rem; font-weight: 700; color: #F8FAFC; margin: 2.5rem 0 1.5rem; padding-bottom: 0.75rem; position: relative;
 }
-
 .section-header-enhanced::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background: linear-gradient(90deg, #60A5FA 0%, #A78BFA 50%, transparent 100%);
-  border-radius: 10px;
+  content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px;
+  background: linear-gradient(90deg, #60A5FA 0%, #A78BFA 50%, transparent 100%); border-radius: 10px;
 }
 
-/* Info boxes with icons */
+/* Info box */
 .info-box {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
-  border-left: 4px solid #60A5FA;
-  border-radius: 12px;
-  padding: 1rem 1.5rem;
-  margin: 1rem 0;
-  backdrop-filter: blur(10px);
+  background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(147,51,234,0.1) 100%);
+  border-left: 4px solid #60A5FA; border-radius: 12px; padding: 1rem 1.5rem; margin: 1rem 0; backdrop-filter: blur(10px);
 }
 
-/* Pulse animation for important elements */
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(96, 165, 250, 0.2); }
-  50% { box-shadow: 0 0 40px rgba(96, 165, 250, 0.4); }
-}
-
-.pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
+/* Pulse */
+@keyframes pulse-glow { 0%,100%{ box-shadow:0 0 20px rgba(96,165,250,0.2);} 50%{ box-shadow:0 0 40px rgba(96,165,250,0.4);} }
+.pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
 </style>
 """
-
 st.markdown(DARK_THEME_CSS, unsafe_allow_html=True)
 
-# === Logo (Hexa.png en Desktop o carpeta del proyecto) — añadido ===
+# === Logo (Hexa.png) support ===
 BASE_DIR = Path(__file__).parent.resolve()
 LOGO_CANDIDATES = [
     Path.home() / "Desktop" / "Hexa.png",   # Desktop
-    BASE_DIR / "Hexa.png",                   # raíz del proyecto
-    BASE_DIR / "assets" / "Hexa.png",        # /assets
-    BASE_DIR / "static" / "Hexa.png",        # /static
-    BASE_DIR / "images" / "Hexa.png",        # /images
+    BASE_DIR / "Hexa.png",                   # project root
+    BASE_DIR / "assets" / "Hexa.png",
+    BASE_DIR / "static" / "Hexa.png",
+    BASE_DIR / "images" / "Hexa.png",
 ]
 
 def _first_existing(paths):
@@ -242,7 +150,7 @@ def _img_to_base64(img) -> str:
 
 logo_img = _load_logo(RESOLVED_LOGO)
 logo_b64 = _img_to_base64(logo_img)
-# === fin bloque de logo ===
+# === end logo block ===
 
 # === Constantes y helpers ===
 APP_VERSION = "6.6-AQ"
@@ -324,16 +232,16 @@ def calcular_resultados_ejecutivo(
 # === Page config ===
 st.set_page_config(
     page_title="Aquila — Análisis de Riesgo Crediticio",
-    page_icon=logo_img if logo_img else "📊",  # <- usar tu Hexa.png si existe
+    page_icon=logo_img if logo_img else "📊",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # === Sidebar ===
 with st.sidebar:
-    # Mostrar logo en la barra lateral si está disponible
+    # Show your logo in the sidebar (no deprecated params)
     if logo_img:
-        st.image(logo_img, use_column_width=True)
+        st.image(logo_img, use_container_width=True)
         st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
 
     st.markdown("### 🦅 AQUILA")
@@ -351,7 +259,7 @@ with st.sidebar:
     st.caption(f"© {datetime.now().year} · Juan José Mostajo León")
     st.caption(f"Version {APP_VERSION}")
 
-# Mostrar logo centrado arriba del header si está disponible (no altera tu header)
+# Optional centered logo above header
 if logo_b64:
     st.markdown(
         f"<div style='text-align:center; padding-top: 1rem;'>"
@@ -564,13 +472,13 @@ if uploaded:
             
             st.markdown("<br/><div class='section-header-enhanced'>📈 Métricas Clave</div>", unsafe_allow_html=True)
             
-            col1, col2, col3, col4 = st.columns(4)
+            colm1, colm2, colm3, colm4 = st.columns(4)
             
             metrics_data = [
-                ("Probabilidad Default", f"{resultado['PD_12m']*100:.2f}%", "12 meses", "#EF4444", col1),
-                ("LGD", f"{resultado['LGD']*100:.2f}%", "Loss Given Default", "#F59E0B", col2),
-                ("Pérdida Dada Default", fmt_usd(resultado['PDD'], 0), "PDD", "#A78BFA", col3),
-                ("Retorno Esperado", f"{resultado['RE_anual_simple']*100:.2f}%", "Anual", decision_color, col4)
+                ("Probabilidad Default", f"{resultado['PD_12m']*100:.2f}%", "12 meses", "#EF4444", colm1),
+                ("LGD", f"{resultado['LGD']*100:.2f}%", "Loss Given Default", "#F59E0B", colm2),
+                ("Pérdida Dada Default", fmt_usd(resultado['PDD'], 0), "PDD", "#A78BFA", colm3),
+                ("Retorno Esperado", f"{resultado['RE_anual_simple']*100:.2f}%", "Anual", decision_color, colm4)
             ]
             
             for label, value, subtitle, color, column in metrics_data:
