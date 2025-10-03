@@ -24,6 +24,7 @@ from PIL import Image
 from string import Template
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+import base64  # <-- added
 
 _embed_font_css()
 
@@ -68,10 +69,10 @@ section[data-testid="stSidebar"] {
 .stApp::before {
   content: '';
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
   background: linear-gradient(45deg, 
     rgba(96, 165, 250, 0.03) 0%, 
     rgba(167, 139, 250, 0.03) 25%,
@@ -205,6 +206,43 @@ section[data-testid="stSidebar"] {
 
 st.markdown(DARK_THEME_CSS, unsafe_allow_html=True)
 
+# === Logo (Hexa.png) — added, non-invasive ===
+BASE_DIR = Path(__file__).parent.resolve()
+LOGO_CANDIDATES = [
+    BASE_DIR / "Hexa.png",
+    BASE_DIR / "assets" / "Hexa.png",
+    BASE_DIR / "static" / "Hexa.png",
+    BASE_DIR / "images" / "Hexa.png",
+]
+
+def _first_existing(paths):
+    for p in paths:
+        if p.exists() and p.is_file():
+            return p
+    return None
+
+RESOLVED_LOGO = _first_existing(LOGO_CANDIDATES)
+
+@st.cache_data(show_spinner=False)
+def load_logo(path: Path | None):
+    if not path:
+        return None
+    try:
+        return Image.open(path)
+    except Exception:
+        return None
+
+def _img_to_base64(img) -> str:
+    if img is None:
+        return ""
+    buf = BytesIO()
+    img.save(buf, format="PNG")
+    return base64.b64encode(buf.getvalue()).decode("utf-8")
+
+logo_img = load_logo(RESOLVED_LOGO)
+logo_b64 = _img_to_base64(logo_img)
+# === end logo additions ===
+
 # === Constantes y helpers ===
 APP_VERSION = "6.6-AQ"
 CO_ANUAL_FIJO = 0.015
@@ -292,6 +330,12 @@ st.set_page_config(
 
 # === Sidebar ===
 with st.sidebar:
+    # --- added: show logo if available ---
+    if logo_img:
+        st.image(logo_img, use_column_width=True)
+        st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
+    # --- end addition ---
+
     st.markdown("### 🦅 AQUILA")
     st.caption("Análisis de Riesgo Crediticio Inteligente")
     st.divider()
@@ -306,6 +350,17 @@ with st.sidebar:
     st.divider()
     st.caption(f"© {datetime.now().year} · Juan José Mostajo León")
     st.caption(f"Version {APP_VERSION}")
+
+# --- added: centered logo above header (non-invasive) ---
+if logo_b64:
+    st.markdown(
+        f"<div style='text-align:center; padding-top: 1rem;'>"
+        f"<img src='data:image/png;base64,{logo_b64}' alt='AQUILA logo' "
+        f"style='height:72px; margin-bottom:6px; filter: drop-shadow(0 0 12px rgba(96,165,250,.25));'/>"
+        f"</div>",
+        unsafe_allow_html=True
+    )
+# --- end addition ---
 
 # Header
 st.markdown("""
