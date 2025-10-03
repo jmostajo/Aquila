@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 import streamlit as st
 from fonts_embed import _embed_font_css
@@ -83,32 +82,6 @@ section[data-testid="stSidebar"] {
   animation: gradient-shift 15s ease infinite;
   pointer-events: none;
   z-index: 0;
-}
-
-/* Enhanced step indicators */
-.step-indicator {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, rgba(96, 165, 250, 0.15) 0%, rgba(167, 139, 250, 0.15) 100%);
-  border: 1px solid rgba(96, 165, 250, 0.3);
-  border-radius: 12px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 20px rgba(96, 165, 250, 0.1);
-  transition: all 0.3s ease;
-}
-
-.step-indicator:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 30px rgba(96, 165, 250, 0.2);
-}
-
-.step-complete {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(16, 185, 129, 0.2) 100%);
-  border-color: rgba(34, 197, 94, 0.4);
 }
 
 /* Enhanced metric cards */
@@ -208,66 +181,6 @@ section[data-testid="stSidebar"] {
   border-radius: 10px;
 }
 
-/* Progress steps */
-.progress-steps {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 2rem 0;
-  position: relative;
-}
-
-.progress-step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  position: relative;
-  z-index: 2;
-}
-
-.progress-step-circle {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 1.2rem;
-  background: rgba(30, 41, 59, 0.8);
-  border: 2px solid rgba(96, 165, 250, 0.3);
-  transition: all 0.4s ease;
-}
-
-.progress-step-active .progress-step-circle {
-  background: linear-gradient(135deg, #60A5FA, #A78BFA);
-  border-color: transparent;
-  box-shadow: 0 0 30px rgba(96, 165, 250, 0.5);
-  transform: scale(1.1);
-}
-
-.progress-step-complete .progress-step-circle {
-  background: linear-gradient(135deg, #22C55E, #10B981);
-  border-color: transparent;
-}
-
-.progress-line {
-  position: absolute;
-  top: 24px;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: rgba(96, 165, 250, 0.2);
-  z-index: 1;
-}
-
-.progress-line-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #60A5FA, #A78BFA);
-  transition: width 0.5s ease;
-}
-
 /* Info boxes with icons */
 .info-box {
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
@@ -292,24 +205,7 @@ section[data-testid="stSidebar"] {
 
 st.markdown(DARK_THEME_CSS, unsafe_allow_html=True)
 
-# [REST OF YOUR ORIGINAL CODE - Face gate, FastAPI setup, etc. - UNCHANGED]
-# === FACE WELCOME OVERLAY (keeping your original) ===
-WELCOME_CSS = """
-<style>
-.face-welcome-overlay { position: fixed; inset: 0; width: 100vw; height: 100vh;
-  background: linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(30,41,59,0.92) 50%, rgba(15,23,42,0.98) 100%);
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 9999;
-  display: flex; justify-content: center; align-items: center;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif; }
-.face-welcome-glass { background: linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.05) 100%);
-  backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-  border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; padding: 2.2rem;
-  max-width: 90vw; width: 800px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1); }
-</style>
-"""
-
-# [Keep all your original helper functions and imports]
-# === Constantes y helpers (UNCHANGED) ===
+# === Constantes y helpers ===
 APP_VERSION = "6.6-AQ"
 CO_ANUAL_FIJO = 0.015
 TM_ANUAL_FIJO = 0.0075
@@ -370,7 +266,7 @@ def calcular_resultados_ejecutivo(
     PD1 = pd_hazard_months(lam, 12)
     PD2_cond = pd_hazard_months(lam, 3)
     LGD = lgd_politica(garantias_usd, EAD)
-    PDD = LGD * EAD
+    ECL = LGD * EAD
     tc_m = to_monthly(tc_ann)
     co_m = to_monthly(CO_ANUAL_FIJO)
     tm_m = to_monthly(TM_ANUAL_FIJO)
@@ -383,7 +279,7 @@ def calcular_resultados_ejecutivo(
     RE_anual_simple = tc_ann * (1 - PD_12m) - LGD * PD_12m
     Texp = 12.0 + PD1 * 3.0
     multiplo_vp = EV_VP / EAD if EAD > 0 else np.nan
-    return {"PD_12m": PD_12m, "LGD": LGD, "PDD": PDD, "RE_anual_simple": RE_anual_simple,
+    return {"PD_12m": PD_12m, "LGD": LGD, "ECL": ECL, "RE_anual_simple": RE_anual_simple,
             "EV_VP": EV_VP, "multiplo_vp": multiplo_vp, "Texp": Texp}
 
 # === Page config ===
@@ -394,9 +290,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# === ENHANCED UI STARTS HERE ===
-
-# Sidebar with enhanced styling
+# === Sidebar ===
 with st.sidebar:
     st.markdown("### 🦅 AQUILA")
     st.caption("Análisis de Riesgo Crediticio Inteligente")
@@ -413,7 +307,7 @@ with st.sidebar:
     st.caption(f"© {datetime.now().year} · Juan José Mostajo León")
     st.caption(f"Version {APP_VERSION}")
 
-# Header with gradient
+# Header
 st.markdown("""
 <div style='text-align: center; padding: 2rem 0;'>
     <h1 style='font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, #60A5FA 0%, #A78BFA 50%, #F472B6 100%); 
@@ -428,7 +322,6 @@ st.markdown("""
 
 st.divider()
 
-# Enhanced info box
 st.markdown("""
 <div class='info-box'>
     <strong>Guía Rápida:</strong> Siga los pasos numerados en orden para realizar el análisis completo de riesgo crediticio.
@@ -475,7 +368,6 @@ if uploaded:
         EAD_default = float(row.get("Exposición USD", 1_000_000.0))
         garantias_default = float(row.get("GARANTIAS", 600_000.0))
         
-        # Enhanced input section
         st.markdown("#### Configuración de Exposición")
         col_in1, col_in2, col_in3 = st.columns(3)
         
@@ -509,7 +401,7 @@ if uploaded:
                 help="Valor de garantías"
             )
         
-       # === STEP 3: Rate Configuration ===
+        # === STEP 3: Rate Configuration ===
         st.markdown("<div class='section-header-enhanced'>🧮 Paso 3: Configurar Tasa Compensatoria</div>", unsafe_allow_html=True)
         
         col_rate1, col_rate2, col_rate3 = st.columns([2, 2, 1])
@@ -591,7 +483,6 @@ if uploaded:
             
             decision_ok = resultado["RE_anual_simple"] >= RET_THRESHOLD
             
-            # Enhanced decision banner
             st.markdown("<br/>", unsafe_allow_html=True)
             decision_color = "#22C55E" if decision_ok else "#EF4444"
             decision_icon = "✅" if decision_ok else "⛔"
@@ -617,7 +508,6 @@ if uploaded:
             </div>
             """, unsafe_allow_html=True)
             
-            # Enhanced metrics grid
             st.markdown("<br/><div class='section-header-enhanced'>📈 Métricas Clave</div>", unsafe_allow_html=True)
             
             col1, col2, col3, col4 = st.columns(4)
@@ -646,21 +536,19 @@ if uploaded:
                     </div>
                     """, unsafe_allow_html=True)
             
-            # === STEP 6: Collateral Haircut === (NOTA: INDENTADO CORRECTAMENTE DENTRO DEL if analizar:)
+            # === STEP 6: Collateral Haircut ===
             st.markdown("<br/><div class='section-header-enhanced'>🛡️ Paso 6: Castigar Garantías</div>", unsafe_allow_html=True)
             
-            # Leer valores base del Excel
             try:
-                garantia_bruta_base = float(row.iloc[8])  # Columna I
+                garantia_bruta_base = float(row.iloc[8])
             except Exception:
                 garantia_bruta_base = 0.0
             
             try:
-                # Función para leer peso de garantía de columna M
                 def leer_peso_garantia_colM(row, fallback_colnames=("Peso de la Garantía", "Peso de la Garantia")):
                     val = None
                     try: 
-                        val = row.iloc[12]  # Columna M (13ª columna, índice 12)
+                        val = row.iloc[12]
                     except Exception: 
                         val = None
                     
@@ -686,7 +574,6 @@ if uploaded:
             except Exception:
                 peso_garantia_base = 1.0
             
-            # Inputs editables con +/-
             col_edit1, col_edit2 = st.columns(2)
             
             with col_edit1:
@@ -710,10 +597,8 @@ if uploaded:
                     help="Factor de ajuste por calidad (0-1)"
                 )
             
-            # Calcular garantía castigada con valores editados
             garantia_castigada = garantia_bruta_edit * peso_garantia_edit
             
-            # Mostrar resultados con KPI Cards
             st.markdown("<br/>", unsafe_allow_html=True)
             col_res1, col_res2, col_res3 = st.columns(3)
             
@@ -740,7 +625,7 @@ if uploaded:
                         text-transform: uppercase; margin-bottom: 0.5rem;'>
                         Factor de Ajuste
                     </div>
-                    <div style='font-size: 2rem; font-weight: 800; color: #A78BFA;'>
+                    <div style='font-size: 2rem; font-weight:800; color: #A78BFA;'>
                         {peso_garantia_edit:.2%}
                     </div>
                     <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5); margin-top: 0.3rem;'>
@@ -766,3 +651,21 @@ if uploaded:
                 """, unsafe_allow_html=True)
             
             st.caption(f"**Fórmula:** {fmt_usd(garantia_bruta_edit, 0)} × {peso_garantia_edit:.2%} = {fmt_usd(garantia_castigada, 0)}")
+    
+    except Exception as e:
+        st.error(f"Error al leer archivo: {e}")
+        st.info("Verifique que el archivo tenga el formato correcto")
+        st.stop()
+else:
+    st.warning("⏳ Esperando archivo... Por favor cargue OPINT.xlsx para continuar")
+    st.stop()
+
+# Footer
+st.markdown("<br/><br/>", unsafe_allow_html=True)
+st.divider()
+st.markdown("""
+<div style='text-align: center; color: rgba(248, 250, 252, 0.5); font-size: 0.85rem;'>
+    <p>Aquila Risk Analysis System · Powered by Advanced Credit Modeling</p>
+    <p>© 2025 Juan José Mostajo León · Version 6.6-AQ</p>
+</div>
+""", unsafe_allow_html=True)
