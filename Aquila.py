@@ -29,90 +29,472 @@ import base64  # for logo encoding
 _embed_font_css()
 
 # ===========================
-# ENHANCED DARK THEME WITH MODERN AESTHETICS
+# FUTURISTIC DARK THEME WITH ADVANCED VISUALS
 # ===========================
-DARK_THEME_CSS = """
+FUTURISTIC_THEME_CSS = """
 <style>
-:root { color-scheme: dark !important; }
+:root { 
+    color-scheme: dark !important; 
+    --primary-glow: radial-gradient(circle at 50% 50%, rgba(96, 165, 250, 0.15) 0%, transparent 70%);
+    --secondary-glow: radial-gradient(circle at 20% 80%, rgba(167, 139, 250, 0.1) 0%, transparent 50%);
+    --accent-glow: radial-gradient(circle at 80% 20%, rgba(244, 114, 182, 0.1) 0%, transparent 50%);
+}
+
 html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"], .main {
-  background-color: #0F1721 !important; color: #F8FAFC !important; transition: none !important;
+    background-color: #0A0F1A !important; 
+    color: #F8FAFC !important; 
+    transition: none !important;
 }
-div, section, header, main, aside, nav { background-color: transparent !important; }
-section[data-testid="stSidebar"] {
-  background: linear-gradient(180deg, #1A2332 0%, #0F1721 100%) !important;
-  border-right: 1px solid rgba(96, 165, 250, 0.1) !important;
-}
-.stApp { background: radial-gradient(ellipse at top, #1e3a5f 0%, #0F1721 50%, #0a0f1a 100%) !important; }
-[data-testid="stAppViewContainer"] > div:first-child { background-color: transparent !important; }
 
-/* Animated gradient background effect */
-@keyframes gradient-shift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+div, section, header, main, aside, nav { 
+    background-color: transparent !important; 
+}
+
+/* Main app background with animated gradient mesh */
+.stApp {
+    background: 
+        radial-gradient(ellipse at top left, rgba(30, 58, 138, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at top right, rgba(88, 28, 135, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at bottom left, rgba(190, 24, 93, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at bottom right, rgba(14, 165, 233, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, #0A0F1A 0%, #111827 50%, #0A0F1A 100%) !important;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Animated background elements */
 .stApp::before {
-  content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(45deg,
-    rgba(96, 165, 250, 0.03) 0%, rgba(167, 139, 250, 0.03) 25%,
-    rgba(244, 114, 182, 0.03) 50%, rgba(96, 165, 250, 0.03) 75%,
-    rgba(167, 139, 250, 0.03) 100%);
-  background-size: 400% 400%; animation: gradient-shift 15s ease infinite;
-  pointer-events: none; z-index: 0;
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        var(--primary-glow),
+        var(--secondary-glow),
+        var(--accent-glow);
+    background-size: 100% 100%;
+    animation: gradient-pulse 20s ease infinite;
+    pointer-events: none;
+    z-index: -1;
 }
 
-/* Cards */
-.metric-card {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 33, 0.9) 100%);
-  border: 1px solid rgba(96, 165, 250, 0.2); border-radius: 16px; padding: 1.5rem;
-  backdrop-filter: blur(20px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden;
-}
-.metric-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, #60A5FA, #A78BFA, #F472B6); opacity: 0; transition: opacity 0.3s ease; }
-.metric-card:hover::before { opacity: 1; }
-.metric-card:hover { transform: translateY(-4px); border-color: rgba(96, 165, 250, 0.4);
-  box-shadow: 0 12px 48px rgba(96, 165, 250, 0.2); }
-
-/* Inputs */
-.stNumberInput input, .stSelectbox select {
-  background: rgba(15, 23, 33, 0.6) !important; border: 1px solid rgba(96, 165, 250, 0.2) !important;
-  border-radius: 10px !important; color: #F8FAFC !important; padding: 0.75rem !important; transition: all 0.3s ease !important;
-}
-.stNumberInput input:focus, .stSelectbox select:focus {
-  border-color: rgba(96, 165, 250, 0.5) !important; box-shadow: 0 0 20px rgba(96, 165, 250, 0.15) !important;
+@keyframes gradient-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
 }
 
-/* Slider */
+/* Floating particles effect */
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+.floating-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(96, 165, 250, 0.3);
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+}
+
+/* Enhanced sidebar */
+section[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, 
+        rgba(26, 35, 50, 0.95) 0%, 
+        rgba(15, 23, 33, 0.98) 100%) !important;
+    border-right: 1px solid rgba(96, 165, 250, 0.15) !important;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 60px rgba(96, 165, 250, 0.1);
+}
+
+/* Futuristic cards with glass morphism */
+.futuristic-card {
+    background: linear-gradient(135deg, 
+        rgba(30, 41, 59, 0.7) 0%, 
+        rgba(15, 23, 33, 0.9) 100%);
+    border: 1px solid rgba(96, 165, 250, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    backdrop-filter: blur(20px);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.futuristic-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(96, 165, 250, 0.1), 
+        transparent);
+    transition: left 0.6s ease;
+}
+
+.futuristic-card:hover::before {
+    left: 100%;
+}
+
+.futuristic-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: rgba(96, 165, 250, 0.4);
+    box-shadow: 
+        0 20px 60px rgba(96, 165, 250, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Enhanced metric cards */
+.metric-card-futuristic {
+    background: linear-gradient(135deg, 
+        rgba(30, 41, 59, 0.8) 0%, 
+        rgba(15, 23, 33, 0.95) 100%);
+    border: 1px solid rgba(96, 165, 250, 0.15);
+    border-radius: 16px;
+    padding: 1.5rem;
+    backdrop-filter: blur(15px);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card-futuristic::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #60A5FA, #A78BFA, #F472B6);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.metric-card-futuristic:hover::after {
+    opacity: 1;
+}
+
+.metric-card-futuristic:hover {
+    transform: translateY(-4px);
+    border-color: rgba(96, 165, 250, 0.3);
+    box-shadow: 
+        0 12px 48px rgba(96, 165, 250, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Futuristic inputs */
+.stNumberInput input, .stSelectbox select, .stTextInput input {
+    background: rgba(15, 23, 33, 0.6) !important;
+    border: 1px solid rgba(96, 165, 250, 0.2) !important;
+    border-radius: 12px !important;
+    color: #F8FAFC !important;
+    padding: 0.75rem 1rem !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px);
+}
+
+.stNumberInput input:focus, .stSelectbox select:focus, .stTextInput input:focus {
+    border-color: rgba(96, 165, 250, 0.6) !important;
+    box-shadow: 
+        0 0 0 3px rgba(96, 165, 250, 0.1),
+        0 0 30px rgba(96, 165, 250, 0.2) !important;
+    background: rgba(15, 23, 33, 0.8) !important;
+}
+
+/* Enhanced slider */
 .stSlider [data-baseweb="slider"] {
-  background: linear-gradient(to right, rgb(239,68,68), rgb(251,146,60), rgb(234,179,8), rgb(132,204,22), rgb(34,197,94)) !important;
-  height: 8px !important; border-radius: 10px !important;
+    background: linear-gradient(90deg, 
+        rgb(239, 68, 68), 
+        rgb(251, 146, 60), 
+        rgb(234, 179, 8), 
+        rgb(132, 204, 22), 
+        rgb(34, 197, 94)) !important;
+    height: 8px !important;
+    border-radius: 10px !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Buttons */
-.stButton button {
-  font-weight: 600 !important; letter-spacing: 0.05em !important; transition: all 0.3s cubic-bezier(0.4,0,0.2,1) !important;
-  border-radius: 12px !important; box-shadow: 0 4px 20px rgba(0,0,0,0.2) !important;
-}
-.stButton button:hover { transform: translateY(-2px) !important; box-shadow: 0 6px 30px rgba(96,165,250,0.3) !important; }
-
-/* Section headers */
-.section-header-enhanced {
-  font-size: 1.8rem; font-weight: 700; color: #F8FAFC; margin: 2.5rem 0 1.5rem; padding-bottom: 0.75rem; position: relative;
-}
-.section-header-enhanced::after {
-  content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px;
-  background: linear-gradient(90deg, #60A5FA 0%, #A78BFA 50%, transparent 100%); border-radius: 10px;
+.stSlider [data-baseweb="slider"]:hover {
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 10px rgba(96, 165, 250, 0.3);
 }
 
-/* Info box */
-.info-box {
-  background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(147,51,234,0.1) 100%);
-  border-left: 4px solid #60A5FA; border-radius: 12px; padding: 1rem 1.5rem; margin: 1rem 0; backdrop-filter: blur(10px);
+/* Futuristic buttons */
+.futuristic-button {
+    background: linear-gradient(135deg, #60A5FA 0%, #A78BFA 50%, #F472B6 100%) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    color: white !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.05em !important;
+    padding: 0.75rem 2rem !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    box-shadow: 
+        0 8px 32px rgba(96, 165, 250, 0.3),
+        0 2px 8px rgba(0, 0, 0, 0.2) !important;
 }
 
-/* Pulse */
-@keyframes pulse-glow { 0%,100%{ box-shadow:0 0 20px rgba(96,165,250,0.2);} 50%{ box-shadow:0 0 40px rgba(96,165,250,0.4);} }
-.pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+.futuristic-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.2), 
+        transparent);
+    transition: left 0.6s ease;
+}
+
+.futuristic-button:hover::before {
+    left: 100%;
+}
+
+.futuristic-button:hover {
+    transform: translateY(-3px) scale(1.05) !important;
+    box-shadow: 
+        0 15px 45px rgba(96, 165, 250, 0.4),
+        0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Section headers with futuristic design */
+.section-header-futuristic {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #60A5FA 0%, #A78BFA 50%, #F472B6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 3rem 0 2rem;
+    padding: 1rem 0;
+    position: relative;
+    text-align: center;
+}
+
+.section-header-futuristic::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #60A5FA, #A78BFA, #F472B6, transparent);
+    border-radius: 2px;
+}
+
+/* Step indicators */
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2rem 0;
+    gap: 2rem;
+}
+
+.step-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1E293B 0%, #0F1721 100%);
+    border: 2px solid rgba(96, 165, 250, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: #60A5FA;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.step-circle.active {
+    background: linear-gradient(135deg, #60A5FA 0%, #A78BFA 100%);
+    color: white;
+    border-color: #60A5FA;
+    box-shadow: 0 0 20px rgba(96, 165, 250, 0.4);
+}
+
+.step-circle.completed {
+    background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
+    color: white;
+    border-color: #22C55E;
+}
+
+.step-connector {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(96, 165, 250, 0.3), rgba(96, 165, 250, 0.1));
+    max-width: 80px;
+}
+
+/* Enhanced info boxes */
+.info-box-futuristic {
+    background: linear-gradient(135deg, 
+        rgba(59, 130, 246, 0.1) 0%, 
+        rgba(147, 51, 234, 0.1) 100%);
+    border-left: 4px solid #60A5FA;
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    margin: 2rem 0;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(96, 165, 250, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* Advanced animations */
+@keyframes hologram-glow {
+    0%, 100% { 
+        box-shadow: 
+            0 0 20px rgba(96, 165, 250, 0.3),
+            inset 0 0 20px rgba(96, 165, 250, 0.1);
+    }
+    50% { 
+        box-shadow: 
+            0 0 40px rgba(96, 165, 250, 0.6),
+            inset 0 0 30px rgba(96, 165, 250, 0.2);
+    }
+}
+
+.hologram-glow {
+    animation: hologram-glow 3s ease-in-out infinite;
+}
+
+@keyframes data-stream {
+    0% { transform: translateY(-100%); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateY(100%); opacity: 0; }
+}
+
+.data-stream {
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent, #60A5FA, transparent);
+    animation: data-stream 2s linear infinite;
+}
+
+/* Decision panel with advanced visuals */
+.decision-panel {
+    background: linear-gradient(135deg, 
+        rgba(30, 41, 59, 0.9) 0%, 
+        rgba(15, 23, 33, 0.95) 100%);
+    border-radius: 24px;
+    padding: 3rem;
+    text-align: center;
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    box-shadow: 
+        0 20px 80px rgba(96, 165, 250, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.decision-panel::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+        from 0deg,
+        transparent,
+        rgba(96, 165, 250, 0.1),
+        rgba(167, 139, 250, 0.1),
+        rgba(244, 114, 182, 0.1),
+        transparent
+    );
+    animation: rotate 10s linear infinite;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Risk visualization */
+.risk-visualization {
+    background: linear-gradient(135deg, 
+        rgba(30, 41, 59, 0.8) 0%, 
+        rgba(15, 23, 33, 0.9) 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid rgba(96, 165, 250, 0.2);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+/* Progress bars */
+.progress-bar-futuristic {
+    background: rgba(15, 23, 33, 0.6);
+    border-radius: 10px;
+    height: 12px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(96, 165, 250, 0.2);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #60A5FA, #A78BFA);
+    border-radius: 10px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.3), 
+        transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
 </style>
 """
-st.markdown(DARK_THEME_CSS, unsafe_allow_html=True)
+
+st.markdown(FUTURISTIC_THEME_CSS, unsafe_allow_html=True)
+
+# Add floating particles
+st.markdown("""
+<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1;">
+    <div class="floating-particle" style="left: 10%; top: 20%; animation-delay: 0s;"></div>
+    <div class="floating-particle" style="left: 20%; top: 60%; animation-delay: 1s;"></div>
+    <div class="floating-particle" style="left: 50%; top: 30%; animation-delay: 2s;"></div>
+    <div class="floating-particle" style="left: 80%; top: 70%; animation-delay: 3s;"></div>
+    <div class="floating-particle" style="left: 90%; top: 40%; animation-delay: 4s;"></div>
+    <div class="floating-particle" style="left: 30%; top: 80%; animation-delay: 5s;"></div>
+</div>
+""", unsafe_allow_html=True)
 
 # === Logo (Hexa.png) support ===
 BASE_DIR = Path(__file__).parent.resolve()
@@ -239,44 +621,54 @@ st.set_page_config(
 
 # === Sidebar ===
 with st.sidebar:
-    # Show your logo in the sidebar (no deprecated params)
+    # Show your logo in the sidebar
     if logo_img:
         st.image(logo_img, use_container_width=True)
         st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
 
-    st.markdown("### 🦅 AQUILA")
-    st.caption("Análisis de Riesgo Crediticio Inteligente")
+    st.markdown("""
+    <div style='text-align: center; padding: 1rem 0;'>
+        <h2 style='margin: 0; background: linear-gradient(135deg, #60A5FA, #A78BFA); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>🦅 AQUILA</h2>
+        <p style='margin: 0; color: rgba(248, 250, 252, 0.7); font-size: 0.9rem;'>Análisis de Riesgo Crediticio Inteligente</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
     st.divider()
     
     RET_THRESHOLD = st.number_input(
-        "Umbral de Retorno Mínimo",
+        "🎯 Umbral de Retorno Mínimo",
         min_value=0.0, max_value=1.0,
         value=0.12, step=0.01, format="%.2f",
         help="Retorno esperado mínimo para aprobar (12% default)"
     )
     
     st.divider()
-    st.caption(f"© {datetime.now().year} · Juan José Mostajo León")
-    st.caption(f"Version {APP_VERSION}")
+    st.markdown("""
+    <div style='text-align: center; color: rgba(248, 250, 252, 0.5); font-size: 0.8rem;'>
+        <p>© {} · Juan José Mostajo León</p>
+        <p>Version {}</p>
+    </div>
+    """.format(datetime.now().year, APP_VERSION), unsafe_allow_html=True)
 
 # Optional centered logo above header
 if logo_b64:
     st.markdown(
-        f"<div style='text-align:center; padding-top: 1rem;'>"
+        f"<div style='text-align:center; padding: 2rem 0 1rem;'>"
         f"<img src='data:image/png;base64,{logo_b64}' alt='AQUILA logo' "
-        f"style='height:72px; margin-bottom:10px; filter: drop-shadow(0 0 12px rgba(96,165,250,.25));'/>"
+        f"style='height:80px; margin-bottom:10px; filter: drop-shadow(0 0 20px rgba(96,165,250,.4));'/>"
         f"</div>",
         unsafe_allow_html=True
     )
 
-# Header
+# Header with enhanced design
 st.markdown("""
-<div style='text-align: center; padding: 2rem 0;'>
-    <h1 style='font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, #60A5FA 0%, #A78BFA 50%, #F472B6 100%); 
-    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem;'>
+<div style='text-align: center; padding: 2rem 0 3rem;'>
+    <h1 style='font-size: 4rem; font-weight: 900; background: linear-gradient(135deg, #60A5FA 0%, #A78BFA 30%, #F472B6 70%, #60A5FA 100%); 
+    background-size: 200% auto; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; 
+    margin-bottom: 0.5rem; animation: gradient-shift 3s ease-in-out infinite;'>
         AQUILA
     </h1>
-    <p style='font-size: 1.2rem; color: rgba(248, 250, 252, 0.7);'>
+    <p style='font-size: 1.3rem; color: rgba(248, 250, 252, 0.8); letter-spacing: 0.05em; text-transform: uppercase;'>
         Sistema de Decisión de Riesgo Crediticio
     </p>
 </div>
@@ -284,14 +676,37 @@ st.markdown("""
 
 st.divider()
 
+# Step indicators
 st.markdown("""
-<div class='info-box'>
-    <strong>Guía Rápida:</strong> Siga los pasos numerados en orden para realizar el análisis completo de riesgo crediticio.
+<div class="step-indicator">
+    <div class="step-circle active">1</div>
+    <div class="step-connector"></div>
+    <div class="step-circle">2</div>
+    <div class="step-connector"></div>
+    <div class="step-circle">3</div>
+    <div class="step-connector"></div>
+    <div class="step-circle">4</div>
+    <div class="step-connector"></div>
+    <div class="step-circle">5</div>
+    <div class="step-connector"></div>
+    <div class="step-circle">6</div>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<div class='info-box-futuristic'>
+    <div style='display: flex; align-items: center; gap: 1rem;'>
+        <div style='font-size: 1.5rem;'>🚀</div>
+        <div>
+            <strong style='font-size: 1.1rem;'>Guía de Análisis:</strong> Siga los pasos numerados en orden para realizar el análisis completo de riesgo crediticio.
+            Cada paso representa una fase crítica en la evaluación del riesgo.
+        </div>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
 # === STEP 1: File Upload ===
-st.markdown("<div class='section-header-enhanced'>📁 Paso 1: Cargar Cartera</div>", unsafe_allow_html=True)
+st.markdown("<div class='section-header-futuristic'>📁 Paso 1: Cargar Cartera de Clientes</div>", unsafe_allow_html=True)
 
 col1, col2 = st.columns([2, 1])
 with col1:
@@ -307,18 +722,29 @@ if uploaded:
         df_cart = df_cart.rename(columns=lambda c: str(c).strip())
         
         with col2:
-            st.markdown("""
-            <div class='metric-card' style='text-align: center;'>
-                <div style='font-size: 2.5rem; font-weight: 800; color: #22C55E;'>✓</div>
-                <div style='font-size: 0.9rem; color: rgba(248, 250, 252, 0.7); margin-top: 0.5rem;'>
-                    Archivo cargado<br/>
-                    <strong>{}</strong> clientes
+            st.markdown(f"""
+            <div class='futuristic-card' style='text-align: center;'>
+                <div style='font-size: 3rem; font-weight: 800; color: #22C55E;'>📊</div>
+                <div style='font-size: 2rem; font-weight: 800; color: #22C55E; margin: 0.5rem 0;'>{len(df_cart)}</div>
+                <div style='font-size: 0.9rem; color: rgba(248, 250, 252, 0.7);'>
+                    Clientes Cargados
+                </div>
+                <div style='font-size: 0.7rem; color: rgba(248, 250, 252, 0.5); margin-top: 0.5rem;'>
+                    Archivo procesado exitosamente
                 </div>
             </div>
-            """.format(len(df_cart)), unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
+        
+        # Update step indicator
+        st.markdown("""
+        <script>
+        document.querySelectorAll('.step-circle')[0].classList.add('completed');
+        document.querySelectorAll('.step-circle')[1].classList.add('active');
+        </script>
+        """, unsafe_allow_html=True)
         
         # === STEP 2: Client Selection ===
-        st.markdown("<div class='section-header-enhanced'>👤 Paso 2: Seleccionar Cliente</div>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header-futuristic'>👤 Paso 2: Seleccionar Cliente para Análisis</div>", unsafe_allow_html=True)
         
         cliente = st.selectbox(
             "Cliente a analizar:",
@@ -330,111 +756,193 @@ if uploaded:
         EAD_default = float(row.get("Exposición USD", 1_000_000.0))
         garantias_default = float(row.get("GARANTIAS", 600_000.0))
         
-        st.markdown("#### Configuración de Exposición")
+        st.markdown("#### Configuración de Exposición y Garantías")
         col_in1, col_in2, col_in3 = st.columns(3)
         
         with col_in1:
+            st.markdown("""
+            <div class='metric-card-futuristic'>
+                <div style='font-size: 2rem; text-align: center; margin-bottom: 1rem;'>💰</div>
+                <div style='text-align: center;'>
+                    <div style='font-size: 0.9rem; color: rgba(248, 250, 252, 0.7); margin-bottom: 0.5rem;'>Exposición al Default</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             EAD_sel = st.number_input(
-                "💰 EAD (USD)",
+                "EAD (USD)",
                 min_value=0.0,
                 value=float(EAD_default),
                 step=10_000.0,
                 format="%.0f",
-                help="Exposición al Default"
+                help="Exposición al Default",
+                label_visibility="collapsed"
             )
         
         with col_in2:
+            st.markdown("""
+            <div class='metric-card-futuristic'>
+                <div style='font-size: 2rem; text-align: center; margin-bottom: 1rem;'>📊</div>
+                <div style='text-align: center;'>
+                    <div style='font-size: 0.9rem; color: rgba(248, 250, 252, 0.7); margin-bottom: 0.5rem;'>Gastos Asociados</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             gastos_sel = st.number_input(
-                "📊 Gastos (USD)",
+                "Gastos (USD)",
                 min_value=0.0,
                 value=0.0,
                 step=1_000.0,
                 format="%.0f",
-                help="Gastos asociados"
+                help="Gastos asociados",
+                label_visibility="collapsed"
             )
         
         with col_in3:
+            st.markdown("""
+            <div class='metric-card-futuristic'>
+                <div style='font-size: 2rem; text-align: center; margin-bottom: 1rem;'>🛡️</div>
+                <div style='text-align: center;'>
+                    <div style='font-size: 0.9rem; color: rgba(248, 250, 252, 0.7); margin-bottom: 0.5rem;'>Valor de Garantías</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             garantias_sel = st.number_input(
-                "🛡️ Garantías (USD)",
+                "Garantías (USD)",
                 min_value=0.0,
                 value=float(garantias_default),
                 step=10_000.0,
                 format="%.0f",
-                help="Valor de garantías"
+                help="Valor de garantías",
+                label_visibility="collapsed"
             )
         
+        # Update step indicator
+        st.markdown("""
+        <script>
+        document.querySelectorAll('.step-circle')[1].classList.add('completed');
+        document.querySelectorAll('.step-circle')[2].classList.add('active');
+        </script>
+        """, unsafe_allow_html=True)
+        
         # === STEP 3: Rate Configuration ===
-        st.markdown("<div class='section-header-enhanced'>🧮 Paso 3: Configurar Tasa Compensatoria</div>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header-futuristic'>🧮 Paso 3: Configurar Tasa Compensatoria</div>", unsafe_allow_html=True)
         
         col_rate1, col_rate2, col_rate3 = st.columns([2, 2, 1])
         
         with col_rate1:
+            st.markdown("""
+            <div class='metric-card-futuristic'>
+                <div style='font-size: 2rem; text-align: center; margin-bottom: 1rem;'>📈</div>
+                <div style='text-align: center;'>
+                    <div style='font-size: 0.9rem; color: rgba(248, 250, 252, 0.7); margin-bottom: 0.5rem;'>Tasa Mensual</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             tasa_m_input = st.number_input(
                 "Tasa Mensual (decimal)",
                 min_value=0.0, max_value=0.20,
                 value=0.025, step=0.001, format="%.4f",
-                help="Ejemplo: 0.025 = 2.50% mensual"
+                help="Ejemplo: 0.025 = 2.50% mensual",
+                label_visibility="collapsed"
             )
         
         with col_rate2:
             tasa_anual_calc = to_annual_from_monthly(tasa_m_input)
             st.markdown(f"""
-            <div class='metric-card'>
-                <div style='font-size: 0.85rem; color: rgba(248, 250, 252, 0.6); margin-bottom: 0.5rem;'>
-                    EQUIVALENTE ANUAL
+            <div class='futuristic-card' style='text-align: center;'>
+                <div style='font-size: 2rem; margin-bottom: 1rem;'>⚡</div>
+                <div style='font-size: 0.85rem; color: rgba(248, 250, 252, 0.6); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;'>
+                    Equivalente Anual
                 </div>
-                <div style='font-size: 2rem; font-weight: 800; color: #A78BFA;'>
+                <div style='font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #A78BFA, #F472B6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
                     {tasa_anual_calc*100:.2f}%
+                </div>
+                <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5); margin-top: 0.5rem;'>
+                    Tasa anualizada
                 </div>
             </div>
             """, unsafe_allow_html=True)
         
         with col_rate3:
             st.markdown("<br>", unsafe_allow_html=True)
-            aplicar_tasa = st.button("✓ Aplicar", key="apply_rate", use_container_width=True, type="primary")
+            aplicar_tasa = st.button("⚡ Aplicar Tasa", key="apply_rate", use_container_width=True, type="primary")
         
         if aplicar_tasa:
             st.session_state["tc_ann_applied"] = tasa_anual_calc
             st.session_state["tasa_aplicada"] = True
-            st.success("Tasa aplicada exitosamente")
+            st.success("✅ Tasa aplicada exitosamente")
         
         if not st.session_state.get("tasa_aplicada", False):
-            st.warning("⏳ Aplique la tasa para continuar")
+            st.warning("⏳ Aplique la tasa para continuar con el análisis")
             st.stop()
         
+        # Update step indicator
+        st.markdown("""
+        <script>
+        document.querySelectorAll('.step-circle')[2].classList.add('completed');
+        document.querySelectorAll('.step-circle')[3].classList.add('active');
+        </script>
+        """, unsafe_allow_html=True)
+        
         # === STEP 4: Risk Score ===
-        st.markdown("<div class='section-header-enhanced'>📊 Paso 4: Calificación de Riesgo</div>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header-futuristic'>📊 Paso 4: Calificación de Riesgo del Cliente</div>", unsafe_allow_html=True)
         
         col_score1, col_score2 = st.columns([3, 1])
         
         with col_score1:
+            st.markdown("""
+            <div class='risk-visualization'>
+                <div style='text-align: center; margin-bottom: 2rem;'>
+                    <div style='font-size: 1.1rem; color: rgba(248, 250, 252, 0.8); margin-bottom: 1rem;'>
+                        Deslice el indicador para ajustar la calificación de riesgo
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
             score = st.slider(
                 "Calificación del Cliente (1=Alto Riesgo, 5=Bajo Riesgo)",
-                min_value=1.0, max_value=5.0, value=3.0, step=0.1
+                min_value=1.0, max_value=5.0, value=3.0, step=0.1,
+                label_visibility="collapsed"
             )
+            st.markdown("</div>", unsafe_allow_html=True)
         
         with col_score2:
-            risk_level = "🔴 Alto" if score < 2.5 else "🟡 Medio" if score < 4.0 else "🟢 Bajo"
+            risk_level = "🔴 Alto Riesgo" if score < 2.5 else "🟡 Riesgo Medio" if score < 4.0 else "🟢 Bajo Riesgo"
             risk_color = "#EF4444" if score < 2.5 else "#EAB308" if score < 4.0 else "#22C55E"
+            risk_width = "20%" if score < 2.5 else "60%" if score < 4.0 else "100%"
+            
             st.markdown(f"""
-            <div class='metric-card' style='text-align: center; border-color: {risk_color};'>
-                <div style='font-size: 2.5rem; font-weight: 800;'>{score:.1f}</div>
-                <div style='font-size: 0.9rem; color: {risk_color}; margin-top: 0.5rem;'>
-                    <strong>{risk_level} Riesgo</strong>
+            <div class='futuristic-card' style='text-align: center; border-color: {risk_color};'>
+                <div style='font-size: 3rem; font-weight: 800; color: {risk_color}; margin-bottom: 1rem;'>{score:.1f}</div>
+                <div style='font-size: 1.1rem; color: {risk_color}; margin-bottom: 1rem; font-weight: 600;'>
+                    {risk_level}
+                </div>
+                <div class='progress-bar-futuristic'>
+                    <div class='progress-fill' style='width: {risk_width}; background: linear-gradient(90deg, {risk_color}, {risk_color});'></div>
+                </div>
+                <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5); margin-top: 1rem;'>
+                    Nivel de Riesgo
                 </div>
             </div>
             """, unsafe_allow_html=True)
         
+        # Update step indicator
+        st.markdown("""
+        <script>
+        document.querySelectorAll('.step-circle')[3].classList.add('completed');
+        document.querySelectorAll('.step-circle')[4].classList.add('active');
+        </script>
+        """, unsafe_allow_html=True)
+        
         # === STEP 5: Analyze ===
-        st.markdown("<div class='section-header-enhanced'>🎯 Paso 5: Ejecutar Análisis</div>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header-futuristic'>🎯 Paso 5: Ejecutar Análisis de Riesgo</div>", unsafe_allow_html=True)
         
         col_btn = st.columns([1, 2, 1])
         with col_btn[1]:
-            analizar = st.button("🚀 ANALIZAR RIESGO", type="primary", use_container_width=True, key="analyze")
+            analizar = st.button("🚀 EJECUTAR ANÁLISIS COMPLETO", type="primary", use_container_width=True, key="analyze")
         
         if analizar:
-            with st.spinner("Calculando métricas de riesgo..."):
-                time.sleep(0.8)
+            with st.spinner("🔍 Calculando métricas de riesgo..."):
+                time.sleep(1.2)
                 resultado = calcular_resultados_ejecutivo(
                     score=score,
                     EAD=EAD_sel,
@@ -449,28 +957,30 @@ if uploaded:
             decision_color = "#22C55E" if decision_ok else "#EF4444"
             decision_icon = "✅" if decision_ok else "⛔"
             decision_text = "APROBAR CRÉDITO" if decision_ok else "RECHAZAR CRÉDITO"
+            decision_subtext = "Cumple con el umbral de retorno mínimo" if decision_ok else "No cumple con el umbral de retorno mínimo"
             
             st.markdown(f"""
-            <div class='metric-card pulse-glow' style='
-                text-align: center; 
-                padding: 3rem 2rem; 
-                border: 3px solid {decision_color};
-                background: linear-gradient(135deg, 
-                    rgba({'34, 197, 94' if decision_ok else '239, 68, 68'}, 0.15) 0%, 
-                    rgba({'34, 197, 94' if decision_ok else '239, 68, 68'}, 0.05) 100%);
-            '>
-                <div style='font-size: 4rem; margin-bottom: 1rem;'>{decision_icon}</div>
-                <div style='font-size: 2.5rem; font-weight: 900; color: {decision_color}; 
-                    letter-spacing: 0.05em; text-transform: uppercase;'>
-                    {decision_text}
-                </div>
-                <div style='font-size: 1.2rem; color: rgba(248, 250, 252, 0.8); margin-top: 1rem;'>
-                    Retorno Esperado: <strong style='color: {decision_color};'>{resultado["RE_anual_simple"]*100:.2f}%</strong>
+            <div class='decision-panel hologram-glow'>
+                <div style='position: relative; z-index: 2;'>
+                    <div style='font-size: 5rem; margin-bottom: 1rem;'>{decision_icon}</div>
+                    <div style='font-size: 3rem; font-weight: 900; color: {decision_color}; 
+                        letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 1rem;'>
+                        {decision_text}
+                    </div>
+                    <div style='font-size: 1.3rem; color: rgba(248, 250, 252, 0.8); margin-bottom: 2rem;'>
+                        {decision_subtext}
+                    </div>
+                    <div style='font-size: 1.5rem; color: {decision_color}; font-weight: 700;'>
+                        Retorno Esperado: {resultado["RE_anual_simple"]*100:.2f}%
+                    </div>
+                    <div style='font-size: 1rem; color: rgba(248, 250, 252, 0.6); margin-top: 1rem;'>
+                        Umbral Mínimo: {RET_THRESHOLD*100:.1f}%
+                    </div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
             
-            st.markdown("<br/><div class='section-header-enhanced'>📈 Métricas Clave</div>", unsafe_allow_html=True)
+            st.markdown("<br/><div class='section-header-futuristic'>📈 Métricas Clave de Riesgo</div>", unsafe_allow_html=True)
             
             colm1, colm2, colm3, colm4 = st.columns(4)
             
@@ -484,22 +994,30 @@ if uploaded:
             for label, value, subtitle, color, column in metrics_data:
                 with column:
                     st.markdown(f"""
-                    <div class='metric-card' style='border-left: 4px solid {color};'>
-                        <div style='font-size: 0.85rem; color: rgba(248, 250, 252, 0.6); 
-                            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;'>
+                    <div class='futuristic-card' style='text-align: center; border-left: 4px solid {color};'>
+                        <div style='font-size: 0.9rem; color: rgba(248, 250, 252, 0.6); 
+                            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;'>
                             {label}
                         </div>
-                        <div style='font-size: 2rem; font-weight: 800; color: {color};'>
+                        <div style='font-size: 2.2rem; font-weight: 800; color: {color}; margin: 1rem 0;'>
                             {value}
                         </div>
-                        <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5); margin-top: 0.3rem;'>
+                        <div style='font-size: 0.85rem; color: rgba(248, 250, 252, 0.5);'>
                             {subtitle}
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
             
+            # Update step indicator
+            st.markdown("""
+            <script>
+            document.querySelectorAll('.step-circle')[4].classList.add('completed');
+            document.querySelectorAll('.step-circle')[5].classList.add('active');
+            </script>
+            """, unsafe_allow_html=True)
+            
             # === STEP 6: Collateral Haircut ===
-            st.markdown("<br/><div class='section-header-enhanced'>🛡️ Paso 6: Castigar Garantías</div>", unsafe_allow_html=True)
+            st.markdown("<div class='section-header-futuristic'>🛡️ Paso 6: Análisis de Garantías en Default</div>", unsafe_allow_html=True)
             
             try:
                 garantia_bruta_base = float(row.iloc[8])
@@ -539,24 +1057,42 @@ if uploaded:
             col_edit1, col_edit2 = st.columns(2)
             
             with col_edit1:
+                st.markdown("""
+                <div class='metric-card-futuristic'>
+                    <div style='font-size: 2rem; text-align: center; margin-bottom: 1rem;'>💎</div>
+                    <div style='text-align: center;'>
+                        <div style='font-size: 0.9rem; color: rgba(248, 250, 252, 0.7); margin-bottom: 0.5rem;'>Garantía Bruta</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
                 garantia_bruta_edit = st.number_input(
-                    "💎 Garantía Bruta (USD) — Valor Realizable",
+                    "Garantía Bruta (USD) — Valor Realizable",
                     min_value=0.0,
                     value=float(garantia_bruta_base),
                     step=10_000.0,
                     format="%.0f",
-                    help="Valor de mercado de la garantía"
+                    help="Valor de mercado de la garantía",
+                    label_visibility="collapsed"
                 )
             
             with col_edit2:
+                st.markdown("""
+                <div class='metric-card-futuristic'>
+                    <div style='font-size: 2rem; text-align: center; margin-bottom: 1rem;'>⚖️</div>
+                    <div style='text-align: center;'>
+                        <div style='font-size: 0.9rem; color: rgba(248, 250, 252, 0.7); margin-bottom: 0.5rem;'>Factor de Calidad</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
                 peso_garantia_edit = st.number_input(
-                    "⚖️ Peso de Garantía — Quality Collateral",
+                    "Peso de Garantía — Quality Collateral",
                     min_value=0.0,
                     max_value=1.0,
                     value=float(peso_garantia_base),
                     step=0.01,
                     format="%.2f",
-                    help="Factor de ajuste por calidad (0-1)"
+                    help="Factor de ajuste por calidad (0-1)",
+                    label_visibility="collapsed"
                 )
             
             garantia_castigada = garantia_bruta_edit * peso_garantia_edit
@@ -566,15 +1102,15 @@ if uploaded:
             
             with col_res1:
                 st.markdown(f"""
-                <div class='metric-card'>
-                    <div style='font-size: 0.85rem; color: rgba(248, 250, 252, 0.6); 
-                        text-transform: uppercase; margin-bottom: 0.5rem;'>
+                <div class='futuristic-card' style='text-align: center;'>
+                    <div style='font-size: 2rem; margin-bottom: 1rem;'>💰</div>
+                    <div style='font-size: 0.9rem; color: rgba(248, 250, 252, 0.6); text-transform: uppercase; margin-bottom: 0.5rem;'>
                         Garantía Bruta
                     </div>
-                    <div style='font-size: 2rem; font-weight: 800; color: #60A5FA;'>
+                    <div style='font-size: 2.2rem; font-weight: 800; color: #60A5FA; margin: 1rem 0;'>
                         {fmt_usd(garantia_bruta_edit, 0)}
                     </div>
-                    <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5); margin-top: 0.3rem;'>
+                    <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5);'>
                         Valor Original
                     </div>
                 </div>
@@ -582,15 +1118,15 @@ if uploaded:
             
             with col_res2:
                 st.markdown(f"""
-                <div class='metric-card'>
-                    <div style='font-size: 0.85rem; color: rgba(248, 250, 252, 0.6); 
-                        text-transform: uppercase; margin-bottom: 0.5rem;'>
+                <div class='futuristic-card' style='text-align: center;'>
+                    <div style='font-size: 2rem; margin-bottom: 1rem;'>📊</div>
+                    <div style='font-size: 0.9rem; color: rgba(248, 250, 252, 0.6); text-transform: uppercase; margin-bottom: 0.5rem;'>
                         Factor de Ajuste
                     </div>
-                    <div style='font-size: 2rem; font-weight:800; color: #A78BFA;'>
+                    <div style='font-size: 2.2rem; font-weight: 800; color: #A78BFA; margin: 1rem 0;'>
                         {peso_garantia_edit:.2%}
                     </div>
-                    <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5); margin-top: 0.3rem;'>
+                    <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5);'>
                         Quality Collateral
                     </div>
                 </div>
@@ -598,36 +1134,54 @@ if uploaded:
             
             with col_res3:
                 st.markdown(f"""
-                <div class='metric-card' style='border: 2px solid #22C55E;'>
-                    <div style='font-size: 0.85rem; color: rgba(248, 250, 252, 0.6); 
-                        text-transform: uppercase; margin-bottom: 0.5rem;'>
+                <div class='futuristic-card' style='text-align: center; border: 2px solid #22C55E;'>
+                    <div style='font-size: 2rem; margin-bottom: 1rem;'>🛡️</div>
+                    <div style='font-size: 0.9rem; color: rgba(248, 250, 252, 0.6); text-transform: uppercase; margin-bottom: 0.5rem;'>
                         Garantía Castigada
                     </div>
-                    <div style='font-size: 2rem; font-weight: 800; color: #22C55E;'>
+                    <div style='font-size: 2.2rem; font-weight: 800; color: #22C55E; margin: 1rem 0;'>
                         {fmt_usd(garantia_castigada, 0)}
                     </div>
-                    <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5); margin-top: 0.3rem;'>
+                    <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5);'>
                         Valor Final
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
             
-            st.caption(f"**Fórmula:** {fmt_usd(garantia_bruta_edit, 0)} × {peso_garantia_edit:.2%} = {fmt_usd(garantia_castigada, 0)}")
+            st.caption(f"**Fórmula de Cálculo:** {fmt_usd(garantia_bruta_edit, 0)} × {peso_garantia_edit:.2%} = {fmt_usd(garantia_castigada, 0)}")
+            
+            # Complete all steps
+            st.markdown("""
+            <script>
+            document.querySelectorAll('.step-circle')[5].classList.add('completed');
+            </script>
+            """, unsafe_allow_html=True)
     
     except Exception as e:
-        st.error(f"Error al leer archivo: {e}")
-        st.info("Verifique que el archivo tenga el formato correcto")
+        st.error(f"❌ Error al leer archivo: {e}")
+        st.info("ℹ️ Verifique que el archivo tenga el formato correcto y la hoja 'CARTERA'")
         st.stop()
 else:
-    st.warning("⏳ Esperando archivo... Por favor cargue OPINT.xlsx para continuar")
+    st.markdown("""
+    <div class='futuristic-card' style='text-align: center; padding: 4rem 2rem;'>
+        <div style='font-size: 4rem; margin-bottom: 2rem;'>📁</div>
+        <div style='font-size: 1.5rem; color: rgba(248, 250, 252, 0.8); margin-bottom: 1rem;'>
+            Esperando Archivo
+        </div>
+        <div style='font-size: 1rem; color: rgba(248, 250, 252, 0.6);'>
+            Por favor cargue el archivo OPINT.xlsx para comenzar el análisis
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     st.stop()
 
 # Footer
 st.markdown("<br/><br/>", unsafe_allow_html=True)
 st.divider()
 st.markdown("""
-<div style='text-align: center; color: rgba(248, 250, 252, 0.5); font-size: 0.85rem;'>
-    <p>Aquila Risk Analysis System · Powered by Advanced Credit Modeling</p>
-    <p>© 2025 Juan José Mostajo León · Version 6.6-AQ</p>
+<div style='text-align: center; color: rgba(248, 250, 252, 0.5); font-size: 0.9rem; padding: 2rem 0;'>
+    <p style='margin: 0.5rem 0; font-size: 1.1rem; color: rgba(248, 250, 252, 0.7);'>Aquila Risk Analysis System</p>
+    <p style='margin: 0.5rem 0;'>Powered by Advanced Credit Modeling & AI</p>
+    <p style='margin: 0.5rem 0;'>© 2025 Juan José Mostajo León · Version 6.6-AQ</p>
 </div>
 """, unsafe_allow_html=True)
