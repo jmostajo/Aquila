@@ -646,26 +646,30 @@ if uploaded:
                     </div>
                     """, unsafe_allow_html=True)
             
-          # === STEP 6: Collateral Haircut ===
+         # === STEP 6: Collateral Haircut ===
 st.markdown("<br/><div class='section-header-enhanced'>🛡️ Paso 6: Castigar Garantías</div>", unsafe_allow_html=True)
 
+# Leer valores base del Excel
 try:
     garantia_bruta_base = float(row.iloc[8])  # Columna I
-except:
+except Exception:
     garantia_bruta_base = 0.0
 
 try:
+    # Función para leer peso de garantía de columna M
     def leer_peso_garantia_colM(row, fallback_colnames=("Peso de la Garantía", "Peso de la Garantia")):
         val = None
         try: 
             val = row.iloc[12]  # Columna M (13ª columna, índice 12)
-        except: 
+        except Exception: 
             val = None
+        
         if val is None or (isinstance(val, float) and np.isnan(val)):
             for cname in fallback_colnames:
                 if cname in row.index:
                     val = row.get(cname)
                     break
+        
         try:
             s = str(val).strip()
             if s == "" or s.lower() == "nan": 
@@ -675,13 +679,14 @@ try:
             if x > 1.0: 
                 x = x / 100.0
             return float(np.clip(x, 0.0, 1.0))
-        except:
+        except Exception:
             return 1.0
     
     peso_garantia_base = leer_peso_garantia_colM(row)
-except:
+except Exception:
     peso_garantia_base = 1.0
 
+# Inputs editables con +/-
 col_edit1, col_edit2 = st.columns(2)
 
 with col_edit1:
@@ -705,9 +710,10 @@ with col_edit2:
         help="Factor de ajuste por calidad (0-1)"
     )
 
+# Calcular garantía castigada con valores editados
 garantia_castigada = garantia_bruta_edit * peso_garantia_edit
 
-# Results display
+# Mostrar resultados con KPI Cards
 st.markdown("<br/>", unsafe_allow_html=True)
 col_res1, col_res2, col_res3 = st.columns(3)
 
