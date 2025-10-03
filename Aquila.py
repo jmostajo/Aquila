@@ -370,7 +370,7 @@ def calcular_resultados_ejecutivo(
     PD1 = pd_hazard_months(lam, 12)
     PD2_cond = pd_hazard_months(lam, 3)
     LGD = lgd_politica(garantias_usd, EAD)
-    ECL = LGD * EAD
+    PDD = LGD * EAD
     tc_m = to_monthly(tc_ann)
     co_m = to_monthly(CO_ANUAL_FIJO)
     tm_m = to_monthly(TM_ANUAL_FIJO)
@@ -383,7 +383,7 @@ def calcular_resultados_ejecutivo(
     RE_anual_simple = tc_ann * (1 - PD_12m) - LGD * PD_12m
     Texp = 12.0 + PD1 * 3.0
     multiplo_vp = EV_VP / EAD if EAD > 0 else np.nan
-    return {"PD_12m": PD_12m, "LGD": LGD, "ECL": ECL, "RE_anual_simple": RE_anual_simple,
+    return {"PD_12m": PD_12m, "LGD": LGD, "PDD": PDD, "RE_anual_simple": RE_anual_simple,
             "EV_VP": EV_VP, "multiplo_vp": multiplo_vp, "Texp": Texp}
 
 # === Page config ===
@@ -625,7 +625,7 @@ if uploaded:
             metrics_data = [
                 ("Probabilidad Default", f"{resultado['PD_12m']*100:.2f}%", "12 meses", "#EF4444", col1),
                 ("LGD", f"{resultado['LGD']*100:.2f}%", "Loss Given Default", "#F59E0B", col2),
-                ("Pérdida Esperada", fmt_usd(resultado['ECL'], 0), "ECL", "#A78BFA", col3),
+                ("Pérdida Dada Default (PDD) ", fmt_usd(resultado['PDD'], 0), "PDD", "#A78BFA", col3),
                 ("Retorno Esperado", f"{resultado['RE_anual_simple']*100:.2f}%", "Anual", decision_color, col4)
             ]
             
