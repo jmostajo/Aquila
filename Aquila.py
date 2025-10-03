@@ -646,113 +646,118 @@ if uploaded:
                     </div>
                     """, unsafe_allow_html=True)
             
-            # === STEP 6: Collateral Haircut ===
-            st.markdown("<br/><div class='section-header-enhanced'>🛡️ Paso 6: Castigar Garantías</div>", unsafe_allow_html=True)
-            
-            try:
-                garantia_bruta_base = float(row.iloc[8])
-            except:
-                garantia_bruta_base = 0.0
-            
-            try:
-                peso_garantia_base = 1.0  # Simplified for layout demo
-            except:
-                peso_garantia_base = 1.0
-            
-            col_edit1, col_edit2 = st.columns(2)
-            
-            with col_edit1:
-                garantia_bruta_edit = st.number_input(
-                    "💎 Garantía Bruta (USD) — Valor Realizable",
-                    min_value=0.0,
-                    value=float(garantia_bruta_base),
-                    step=10_000.0,
-                    format="%.0f",
-                    help="Valor de mercado de la garantía"
-                )
-            
-            with col_edit2:
-                peso_garantia_edit = st.number_input(
-                    "⚖️ Peso de Garantía — Quality Collateral",
-                    min_value=0.0,
-                    max_value=1.0,
-                    value=float(peso_garantia_base),
-                    step=0.01,
-                    format="%.2f",
-                    help="Factor de ajuste por calidad (0-1)"
-                )
-            
-            garantia_castigada = garantia_bruta_edit * peso_garantia_edit
-            
-            # Results display
-            st.markdown("<br/>", unsafe_allow_html=True)
-            col_res1, col_res2, col_res3 = st.columns(3)
-            
-            with col_res1:
-                st.markdown(f"""
-                <div class='metric-card'>
-                    <div style='font-size: 0.85rem; color: rgba(248, 250, 252, 0.6); 
-                        text-transform: uppercase; margin-bottom: 0.5rem;'>
-                        Garantía Bruta
-                    </div>
-                    <div style='font-size: 2rem; font-weight: 800; color: #60A5FA;'>
-                        {fmt_usd(garantia_bruta_edit, 0)}
-                    </div>
-                    <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5); margin-top: 0.3rem;'>
-                        Valor Original
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            with col_res2:
-                st.markdown(f"""
-                <div class='metric-card'>
-                    <div style='font-size: 0.85rem; color: rgba(248, 250, 252, 0.6); 
-                        text-transform: uppercase; margin-bottom: 0.5rem;'>
-                        Factor de Ajuste
-                    </div>
-                    <div style='font-size: 2rem; font-weight: 800; color: #A78BFA;'>
-                        {peso_garantia_edit:.2%}
-                    </div>
-                    <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5); margin-top: 0.3rem;'>
-                        Quality Collateral
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            with col_res3:
-                st.markdown(f"""
-                <div class='metric-card' style='border: 2px solid #22C55E;'>
-                    <div style='font-size: 0.85rem; color: rgba(248, 250, 252, 0.6); 
-                        text-transform: uppercase; margin-bottom: 0.5rem;'>
-                        Garantía Castigada
-                    </div>
-                    <div style='font-size: 2rem; font-weight: 800; color: #22C55E;'>
-                        {fmt_usd(garantia_castigada, 0)}
-                    </div>
-                    <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5); margin-top: 0.3rem;'>
-                        Valor Final
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            st.caption(f"**Fórmula:** {fmt_usd(garantia_bruta_edit, 0)} × {peso_garantia_edit:.2%} = {fmt_usd(garantia_castigada, 0)}")
-            
-    except Exception as e:
-        st.error(f"Error al leer archivo: {e}")
-        st.info("Verifique que el archivo tenga el formato correcto")
-        st.stop()
-else:
-    st.warning("⏳ Esperando archivo... Por favor cargue OPINT.xlsx para continuar")
-    st.stop()
+          # === STEP 6: Collateral Haircut ===
+st.markdown("<br/><div class='section-header-enhanced'>🛡️ Paso 6: Castigar Garantías</div>", unsafe_allow_html=True)
 
-# Footer
-st.markdown("<br/><br/>", unsafe_allow_html=True)
-st.divider()
-st.markdown("""
-<div style='text-align: center; color: rgba(248, 250, 252, 0.5); font-size: 0.85rem;'>
-    <p>Aquila Risk Analysis System · Powered by Advanced Credit Modeling</p>
-    <p>© 2025 Juan José Mostajo León · Version 6.6-AQ</p>
-</div>
-""", unsafe_allow_html=True)
+try:
+    garantia_bruta_base = float(row.iloc[8])  # Columna I
+except:
+    garantia_bruta_base = 0.0
+
+try:
+    def leer_peso_garantia_colM(row, fallback_colnames=("Peso de la Garantía", "Peso de la Garantia")):
+        val = None
+        try: 
+            val = row.iloc[12]  # Columna M (13ª columna, índice 12)
+        except: 
+            val = None
+        if val is None or (isinstance(val, float) and np.isnan(val)):
+            for cname in fallback_colnames:
+                if cname in row.index:
+                    val = row.get(cname)
+                    break
+        try:
+            s = str(val).strip()
+            if s == "" or s.lower() == "nan": 
+                return 1.0
+            s = s.replace("%", "").replace(",", ".")
+            x = float(s)
+            if x > 1.0: 
+                x = x / 100.0
+            return float(np.clip(x, 0.0, 1.0))
+        except:
+            return 1.0
+    
+    peso_garantia_base = leer_peso_garantia_colM(row)
+except:
+    peso_garantia_base = 1.0
+
+col_edit1, col_edit2 = st.columns(2)
+
+with col_edit1:
+    garantia_bruta_edit = st.number_input(
+        "💎 Garantía Bruta (USD) — Valor Realizable",
+        min_value=0.0,
+        value=float(garantia_bruta_base),
+        step=10_000.0,
+        format="%.0f",
+        help="Valor de mercado de la garantía"
+    )
+
+with col_edit2:
+    peso_garantia_edit = st.number_input(
+        "⚖️ Peso de Garantía — Quality Collateral",
+        min_value=0.0,
+        max_value=1.0,
+        value=float(peso_garantia_base),
+        step=0.01,
+        format="%.2f",
+        help="Factor de ajuste por calidad (0-1)"
+    )
+
+garantia_castigada = garantia_bruta_edit * peso_garantia_edit
+
+# Results display
+st.markdown("<br/>", unsafe_allow_html=True)
+col_res1, col_res2, col_res3 = st.columns(3)
+
+with col_res1:
+    st.markdown(f"""
+    <div class='metric-card'>
+        <div style='font-size: 0.85rem; color: rgba(248, 250, 252, 0.6); 
+            text-transform: uppercase; margin-bottom: 0.5rem;'>
+            Garantía Bruta
+        </div>
+        <div style='font-size: 2rem; font-weight: 800; color: #60A5FA;'>
+            {fmt_usd(garantia_bruta_edit, 0)}
+        </div>
+        <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5); margin-top: 0.3rem;'>
+            Valor Original
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col_res2:
+    st.markdown(f"""
+    <div class='metric-card'>
+        <div style='font-size: 0.85rem; color: rgba(248, 250, 252, 0.6); 
+            text-transform: uppercase; margin-bottom: 0.5rem;'>
+            Factor de Ajuste
+        </div>
+        <div style='font-size: 2rem; font-weight: 800; color: #A78BFA;'>
+            {peso_garantia_edit:.2%}
+        </div>
+        <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5); margin-top: 0.3rem;'>
+            Quality Collateral
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col_res3:
+    st.markdown(f"""
+    <div class='metric-card' style='border: 2px solid #22C55E;'>
+        <div style='font-size: 0.85rem; color: rgba(248, 250, 252, 0.6); 
+            text-transform: uppercase; margin-bottom: 0.5rem;'>
+            Garantía Castigada
+        </div>
+        <div style='font-size: 2rem; font-weight: 800; color: #22C55E;'>
+            {fmt_usd(garantia_castigada, 0)}
+        </div>
+        <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5); margin-top: 0.3rem;'>
+            Valor Final
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.caption(f"**Fórmula:** {fmt_usd(garantia_bruta_edit, 0)} × {peso_garantia_edit:.2%} = {fmt_usd(garantia_castigada, 0)}")
 
