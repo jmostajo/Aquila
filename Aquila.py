@@ -26,6 +26,13 @@ from string import Template
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 import base64  # for logo encoding
+# Agregar en la sección de imports al principio del archivo
+import base64
+from io import BytesIO
+try:
+    from gtts import gTTS
+except ImportError:
+    st.error("gTTS no está instalado. Ejecuta: pip install gtts")
 
 _embed_font_css()
 
@@ -346,12 +353,43 @@ def _hash(p: str) -> str:
 UNIVERSAL_PASSWORD = "Aquila2025!"
 UNIVERSAL_PASSWORD_HASH = _hash(UNIVERSAL_PASSWORD)
 
+def text_to_speech_base64(text: str) -> str:
+    """Convierte texto a audio usando gTTS y retorna base64"""
+    try:
+        from gtts import gTTS
+        import base64
+        from io import BytesIO
+        
+        # Crear audio con gTTS
+        tts = gTTS(text=text, lang='es', slow=False)
+        audio_buffer = BytesIO()
+        tts.write_to_fp(audio_buffer)
+        audio_buffer.seek(0)
+        
+        # Convertir a base64
+        audio_b64 = base64.b64encode(audio_buffer.read()).decode()
+        return audio_b64
+    except Exception as e:
+        st.error(f"Error generando audio: {e}")
+        return ""
+
+def play_audio_from_base64(audio_b64: str):
+    """Reproduce audio desde base64"""
+    audio_html = f"""
+    <audio autoplay>
+        <source src="data:audio/mp3;base64,{audio_b64}" type="audio/mp3">
+    </audio>
+    """
+    st.components.v1.html(audio_html, height=0)
+
 def login_gate():
     # Estados
     if "auth" not in st.session_state:
         st.session_state.auth = False
     if "welcome_done" not in st.session_state:
         st.session_state.welcome_done = False
+    if "audio_played" not in st.session_state:
+        st.session_state.audio_played = False
 
     # Si ya pasó todo, continuar
     if st.session_state.auth and st.session_state.welcome_done:
@@ -375,8 +413,11 @@ def login_gate():
                 name = email.split("@")[0].replace(".", " ").title()
                 st.session_state.user_name = name
                 
-                # Marcar que debemos mostrar pantalla de bienvenida
-                st.session_state.show_welcome = True
+                # Generar audio de bienvenida
+                welcome_text = f"Bienvenido, {name}. Sistema AQUILA activado. Iniciando análisis de riesgo."
+                st.session_state.welcome_audio = text_to_speech_base64(welcome_text)
+                st.session_state.audio_played = False
+                
                 st.rerun()
             else:
                 st.error("Credenciales inválidas. Intenta nuevamente.")
@@ -388,20 +429,30 @@ def login_gate():
         email = st.session_state.get("user_email", "")
         name = st.session_state.get("user_name", "Usuario")
 
-        st.markdown("""
+        # Reproducir audio solo una vez
+        if not st.session_state.audio_played and st.session_state.get("welcome_audio"):
+            play_audio_from_base64(st.session_state.welcome_audio)
+            st.session_state.audio_played = True
+
+        st.markdown(f"""
         <div class='metric-card' style='padding:2rem; text-align:center;'>
             <div style='font-size:3rem; font-weight:900; color:#00ffa3; text-transform:uppercase; letter-spacing:.06em;'>
-                Bienvenido {}
+                Bienvenido {name}
             </div>
             <div style='margin-top:.75rem; color:rgba(215,226,236,.8)'>
-                Autenticación exitosa. Presiona el botón para ingresar a <strong>AQUILA</strong>.
+                🔊 <em>Sistema AQUILA activado</em><br/>
+                Autenticación exitosa. Presiona el botón para ingresar al dashboard.
             </div>
         </div>
-        """.format(name), unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
         col_a, col_b, col_c = st.columns([1,1,1])
         with col_b:
             if st.button("🚀 Entrar a AQUILA", type="primary", use_container_width=True):
+                # Audio de confirmación al entrar
+                enter_audio = text_to_speech_base64("Acceso confirmado. Iniciando interfaz principal.")
+                play_audio_from_base64(enter_audio)
+                
                 st.session_state.welcome_done = True
                 st.rerun()
         st.stop()
