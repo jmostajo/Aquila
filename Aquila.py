@@ -184,21 +184,21 @@ pio.templates["edex"] = go.layout.Template(
         plot_bgcolor="#0a0e14",
         font=dict(family="Fira Code, Share Tech Mono, monospace", color="#00fff6"),
         colorway=["#00fff6", "#00ffa3", "#7a7dff", "#f2d17a", "#ff5ea0"],
-        xaxis=dict(gridcolor="#121a25", zerolinecolor="#121a25", linecolor="rgba(0,255,246,.35)"),
-        yaxis=dict(gridcolor="#121a25", zerolinecolor="#121a25", linecolor="rgba(0,255,246,.35)"),
+        xaxis=dict(gridcolor="#121a25", zerolinecolor="#121a25", linecolor="#00fff6"),
+        yaxis=dict(gridcolor="#121a25", zerolinecolor="#121a25", linecolor="#00fff6"),
         margin=dict(l=50, r=30, t=50, b=40)
     )
 )
 pio.templates.default = "edex"
 
-# Matplotlib estilo EdeX-UI
+# Matplotlib estilo EdeX-UI - CORREGIDO
 def apply_matplotlib_edex():
     mpl.rcParams.update({
         "figure.facecolor": "#0a0e14",
         "axes.facecolor": "#0a0e14",
         "savefig.facecolor": "#0a0e14",
         "text.color": "#00fff6",
-        "axes.edgecolor": "rgba(0,255,246,0.6)",
+        "axes.edgecolor": "#00fff6",  # Corregido: usar color hexadecimal en lugar de rgba
         "axes.labelcolor": "#00fff6",
         "xtick.color": "#d7e2ec",
         "ytick.color": "#d7e2ec",
@@ -206,7 +206,6 @@ def apply_matplotlib_edex():
         "grid.linestyle": "-",
         "axes.grid": True,
         "font.family": "monospace",
-        "font.monospace": ["Fira Code", "Share Tech Mono", "JetBrains Mono", "monospace"],
         "axes.titleweight": "bold",
         "axes.titlepad": 12,
         "axes.titlecolor": "#00fff6",
@@ -339,7 +338,7 @@ st.set_page_config(
 
 # === Sidebar ===
 with st.sidebar:
-    # Show your logo in the sidebar (no deprecated params)
+    # Show your logo in the sidebar
     if logo_img:
         st.image(logo_img, use_container_width=True)
         st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
@@ -364,7 +363,7 @@ if logo_b64:
     st.markdown(
         f"<div style='text-align:center; padding-top: 1rem;'>"
         f"<img src='data:image/png;base64,{logo_b64}' alt='AQUILA logo' "
-        f"style='height:72px; margin-bottom:10px; filter: drop-shadow(0 0 12px rgba(96,165,250,.25));'/>"
+        f"style='height:72px; margin-bottom:10px; filter: drop-shadow(0 0 12px rgba(0,255,246,.4));'/>"
         f"</div>",
         unsafe_allow_html=True
     )
@@ -491,7 +490,7 @@ if uploaded:
         
         with col_rate3:
             st.markdown("<br>", unsafe_allow_html=True)
-            aplicar_tasa = st.button("✓ Aplicar", key="apply_rate", use_container_width=True, type="primary")
+            aplicar_tasa = st.button("✓ Aplicar", key="apply_rate", use_container_width=False, type="primary")
         
         if aplicar_tasa:
             st.session_state["tc_ann_applied"] = tasa_anual_calc
@@ -515,7 +514,7 @@ if uploaded:
         
         with col_score2:
             risk_level = "🔴 Alto" if score < 2.5 else "🟡 Medio" if score < 4.0 else "🟢 Bajo"
-            risk_color = "#EF4444" if score < 2.5 else "#EAB308" if score < 4.0 else "#22C55E"
+            risk_color = "#ff5ea0" if score < 2.5 else "#f2d17a" if score < 4.0 else "#00ffa3"
             st.markdown(f"""
             <div class='metric-card' style='text-align: center; border-color: {risk_color};'>
                 <div style='font-size: 2.5rem; font-weight: 800;'>{score:.1f}</div>
@@ -530,7 +529,7 @@ if uploaded:
         
         col_btn = st.columns([1, 2, 1])
         with col_btn[1]:
-            analizar = st.button("🚀 ANALIZAR RIESGO", type="primary", use_container_width=True, key="analyze")
+            analizar = st.button("🚀 ANALIZAR RIESGO", type="primary", use_container_width=False, key="analyze")
         
         if analizar:
             with st.spinner("Calculando métricas de riesgo..."):
@@ -546,7 +545,7 @@ if uploaded:
             decision_ok = resultado["RE_anual_simple"] >= RET_THRESHOLD
             
             st.markdown("<br/>", unsafe_allow_html=True)
-            decision_color = "#22C55E" if decision_ok else "#EF4444"
+            decision_color = "#00ffa3" if decision_ok else "#ff5ea0"
             decision_icon = "✅" if decision_ok else "⛔"
             decision_text = "APROBAR CRÉDITO" if decision_ok else "RECHAZAR CRÉDITO"
             
@@ -556,8 +555,8 @@ if uploaded:
                 padding: 3rem 2rem; 
                 border: 3px solid {decision_color};
                 background: linear-gradient(135deg, 
-                    rgba({'34, 197, 94' if decision_ok else '239, 68, 68'}, 0.15) 0%, 
-                    rgba({'34, 197, 94' if decision_ok else '239, 68, 68'}, 0.05) 100%);
+                    rgba({'0, 255, 163' if decision_ok else '255, 94, 160'}, 0.15) 0%, 
+                    rgba({'0, 255, 163' if decision_ok else '255, 94, 160'}, 0.05) 100%);
             '>
                 <div style='font-size: 4rem; margin-bottom: 1rem;'>{decision_icon}</div>
                 <div style='font-size: 2.5rem; font-weight: 900; color: {decision_color}; 
@@ -575,8 +574,8 @@ if uploaded:
             colm1, colm2, colm3, colm4 = st.columns(4)
             
             metrics_data = [
-                ("Probabilidad Default", f"{resultado['PD_12m']*100:.2f}%", "12 meses", "#EF4444", colm1),
-                ("LGD", f"{resultado['LGD']*100:.2f}%", "Loss Given Default", "#F59E0B", colm2),
+                ("Probabilidad Default", f"{resultado['PD_12m']*100:.2f}%", "12 meses", "#ff5ea0", colm1),
+                ("LGD", f"{resultado['LGD']*100:.2f}%", "Loss Given Default", "#f2d17a", colm2),
                 ("Pérdida Dada Default", fmt_usd(resultado['PDD'], 0), "PDD", "#7a7dff", colm3),
                 ("Retorno Esperado", f"{resultado['RE_anual_simple']*100:.2f}%", "Anual", decision_color, colm4)
             ]
@@ -698,12 +697,12 @@ if uploaded:
             
             with col_res3:
                 st.markdown(f"""
-                <div class='metric-card' style='border: 2px solid #22C55E;'>
+                <div class='metric-card' style='border: 2px solid #00ffa3;'>
                     <div style='font-size: 0.85rem; color: rgba(215, 226, 236, 0.7); 
                         text-transform: uppercase; margin-bottom: 0.5rem;'>
                         Garantía Castigada
                     </div>
-                    <div style='font-size: 2rem; font-weight: 800; color: #22C55E;'>
+                    <div style='font-size: 2rem; font-weight: 800; color: #00ffa3;'>
                         {fmt_usd(garantia_castigada, 0)}
                     </div>
                     <div style='font-size: 0.8rem; color: rgba(215, 226, 236, 0.6); margin-top: 0.3rem;'>
