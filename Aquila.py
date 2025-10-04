@@ -342,13 +342,9 @@ st.set_page_config(
 def _hash(p: str) -> str:
     return hashlib.sha256(p.encode("utf-8")).hexdigest()
 
-# Usuario de ejemplo (puedes añadir más)
-USERS = {
-    "pieroeghezzi@gmail.com": {
-        "name": "Piero",
-        "pass_hash": _hash("Aquila2025!")  # <-- cambia la clave aquí
-    }
-}
+# Contraseña universal para todos los usuarios
+UNIVERSAL_PASSWORD = "Aquila2025!"
+UNIVERSAL_PASSWORD_HASH = _hash(UNIVERSAL_PASSWORD)
 
 def login_gate():
     # Estados
@@ -370,11 +366,15 @@ def login_gate():
             ok = st.form_submit_button("Entrar")
 
         if ok:
-            user = USERS.get(email.strip().lower())
-            if user and _hash(password) == user["pass_hash"]:
+            # Verificar que se ingresó un correo (cualquiera) y la contraseña universal
+            if email.strip() and _hash(password) == UNIVERSAL_PASSWORD_HASH:
                 st.session_state.auth = True
                 st.session_state.user_email = email.strip().lower()
-                st.session_state.user_name = user["name"]
+                
+                # Extraer nombre del correo (parte antes del @)
+                name = email.split("@")[0].replace(".", " ").title()
+                st.session_state.user_name = name
+                
                 # Marcar que debemos mostrar pantalla de bienvenida
                 st.session_state.show_welcome = True
                 st.rerun()
@@ -386,11 +386,7 @@ def login_gate():
     if st.session_state.auth and not st.session_state.welcome_done:
         # Nombre a mostrar
         email = st.session_state.get("user_email", "")
-        if email == "pieroeghezzi@gmail.com":
-            name = "Piero"
-        else:
-            # fallback: nombre a partir del correo (antes de @)
-            name = st.session_state.get("user_name") or (email.split("@")[0].replace(".", " ").title() if "@" in email else "Usuario")
+        name = st.session_state.get("user_name", "Usuario")
 
         st.markdown("""
         <div class='metric-card' style='padding:2rem; text-align:center;'>
@@ -412,7 +408,6 @@ def login_gate():
 
 # Ejecutar el gate ANTES de construir el resto de la app
 login_gate()
-
 # ===========================
 # (Opcional) Logout en Sidebar
 # — Coloca esto dentro de tu with st.sidebar: existente
