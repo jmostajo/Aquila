@@ -7,6 +7,7 @@ from io import BytesIO
 import json, re, hashlib, secrets
 from datetime import datetime
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import plotly.graph_objects as go
 import plotly.io as pio
 import plotly.express as px
@@ -29,90 +30,189 @@ import base64  # for logo encoding
 _embed_font_css()
 
 # ===========================
-# ENHANCED DARK THEME WITH MODERN AESTHETICS
+# EdeX-UI THEME (CSS + Plotly + Matplotlib)
 # ===========================
-DARK_THEME_CSS = """
+EDEX_UI_CSS = """
 <style>
-:root { color-scheme: dark !important; }
-html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"], .main {
-  background-color: #0F1721 !important; color: #F8FAFC !important; transition: none !important;
-}
-div, section, header, main, aside, nav { background-color: transparent !important; }
-section[data-testid="stSidebar"] {
-  background: linear-gradient(180deg, #1A2332 0%, #0F1721 100%) !important;
-  border-right: 1px solid rgba(96, 165, 250, 0.1) !important;
-}
-.stApp { background: radial-gradient(ellipse at top, #1e3a5f 0%, #0F1721 50%, #0a0f1a 100%) !important; }
-[data-testid="stAppViewContainer"] > div:first-child { background-color: transparent !important; }
-
-/* Animated gradient background effect */
-@keyframes gradient-shift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-.stApp::before {
-  content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(45deg,
-    rgba(96, 165, 250, 0.03) 0%, rgba(167, 139, 250, 0.03) 25%,
-    rgba(244, 114, 182, 0.03) 50%, rgba(96, 165, 250, 0.03) 75%,
-    rgba(167, 139, 250, 0.03) 100%);
-  background-size: 400% 400%; animation: gradient-shift 15s ease infinite;
-  pointer-events: none; z-index: 0;
+/* ---------- VARIABLES ---------- */
+:root{
+  color-scheme: dark !important;
+  --edex-bg: #0a0e14;
+  --edex-bg-2:#0f141b;
+  --edex-grid:#121a25;
+  --edex-cyan:#00fff6;
+  --edex-green:#00ffa3;
+  --edex-magenta:#ff5ea0;
+  --edex-amber:#f2d17a;
+  --edex-fg:#d7e2ec;
+  --edex-dim:#9aa5b1;
+  --radius: 12px;
+  --glow: 0 0 10px rgba(0,255,246,.35), 0 0 30px rgba(0,255,246,.12);
 }
 
-/* Cards */
-.metric-card {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 33, 0.9) 100%);
-  border: 1px solid rgba(96, 165, 250, 0.2); border-radius: 16px; padding: 1.5rem;
-  backdrop-filter: blur(20px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden;
+/* ---------- BACKGROUND + GRID ---------- */
+html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"], .main{
+  background: var(--edex-bg) !important;
+  color: var(--edex-fg) !important;
+  font-family: 'Fira Code', 'JetBrains Mono', 'Share Tech Mono', monospace;
 }
-.metric-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, #60A5FA, #A78BFA, #F472B6); opacity: 0; transition: opacity 0.3s ease; }
-.metric-card:hover::before { opacity: 1; }
-.metric-card:hover { transform: translateY(-4px); border-color: rgba(96, 165, 250, 0.4);
-  box-shadow: 0 12px 48px rgba(96, 165, 250, 0.2); }
-
-/* Inputs */
-.stNumberInput input, .stSelectbox select {
-  background: rgba(15, 23, 33, 0.6) !important; border: 1px solid rgba(96, 165, 250, 0.2) !important;
-  border-radius: 10px !important; color: #F8FAFC !important; padding: 0.75rem !important; transition: all 0.3s ease !important;
+.stApp::before{
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,255,246,.035) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(0,255,246,.03) 0 1px, transparent 1px 24px);
 }
-.stNumberInput input:focus, .stSelectbox select:focus {
-  border-color: rgba(96, 165, 250, 0.5) !important; box-shadow: 0 0 20px rgba(96, 165, 250, 0.15) !important;
+.stApp::after{
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,0) 70%);
+  mix-blend-mode: overlay;
 }
 
-/* Slider */
-.stSlider [data-baseweb="slider"] {
-  background: linear-gradient(to right, rgb(239,68,68), rgb(251,146,60), rgb(234,179,8), rgb(132,204,22), rgb(34,197,94)) !important;
-  height: 8px !important; border-radius: 10px !important;
+/* ---------- SIDEBAR ---------- */
+section[data-testid="stSidebar"]{
+  background: linear-gradient(180deg, var(--edex-bg-2), var(--edex-bg)) !important;
+  border-right:1px solid rgba(0,255,246,.12) !important;
+}
+section[data-testid="stSidebar"] *{ font-family: inherit; }
+
+/* ---------- HEADERS ---------- */
+h1,h2,h3,h4{ color:var(--edex-cyan); text-shadow:0 0 6px rgba(0,255,246,.55); }
+.section-header-enhanced{
+  font-size:1.4rem; font-weight:800; color:var(--edex-cyan);
+  letter-spacing:.06em; text-transform:uppercase; margin:1.8rem 0 1rem;
+  position:relative; padding-bottom:.4rem;
+}
+.section-header-enhanced::after{
+  content:''; position:absolute; left:0; bottom:0; height:2px; width:100%;
+  background: linear-gradient(90deg, var(--edex-cyan), transparent 70%);
+  box-shadow: var(--glow);
 }
 
-/* Buttons */
-.stButton button {
-  font-weight: 600 !important; letter-spacing: 0.05em !important; transition: all 0.3s cubic-bezier(0.4,0,0.2,1) !important;
-  border-radius: 12px !important; box-shadow: 0 4px 20px rgba(0,0,0,0.2) !important;
+/* ---------- CARDS (metric-card) ---------- */
+.metric-card{
+  background: linear-gradient(180deg, rgba(16,22,30,.92), rgba(8,12,18,.96));
+  border:1px solid rgba(0,255,246,.28);
+  border-radius: var(--radius); padding:1rem 1.1rem;
+  box-shadow: inset 0 0 0 1px rgba(0,255,246,.12), 0 8px 30px rgba(0,0,0,.35);
+  position:relative; overflow:hidden; transition:.25s ease;
 }
-.stButton button:hover { transform: translateY(-2px) !important; box-shadow: 0 6px 30px rgba(96,165,250,0.3) !important; }
+.metric-card::before{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background: radial-gradient(600px 120px at 0% 0%, rgba(0,255,246,.12), transparent 60%);
+  opacity:.6;
+}
+.metric-card:hover{ transform:translateY(-2px); box-shadow: var(--glow); }
 
-/* Section headers */
-.section-header-enhanced {
-  font-size: 1.8rem; font-weight: 700; color: #F8FAFC; margin: 2.5rem 0 1.5rem; padding-bottom: 0.75rem; position: relative;
-}
-.section-header-enhanced::after {
-  content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px;
-  background: linear-gradient(90deg, #60A5FA 0%, #A78BFA 50%, transparent 100%); border-radius: 10px;
+/* ---------- INFO BOX ---------- */
+.info-box{
+  background: linear-gradient(135deg, rgba(0,255,246,.08), rgba(0,255,163,.06));
+  border-left:3px solid var(--edex-cyan); border-radius: var(--radius);
+  padding: .75rem 1rem; color: var(--edex-fg);
 }
 
-/* Info box */
-.info-box {
-  background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(147,51,234,0.1) 100%);
-  border-left: 4px solid #60A5FA; border-radius: 12px; padding: 1rem 1.5rem; margin: 1rem 0; backdrop-filter: blur(10px);
+/* ---------- BOTONES ---------- */
+.stButton > button{
+  border:1px solid rgba(0,255,246,.45) !important;
+  background: rgba(10,14,20,.6) !important;
+  color: var(--edex-cyan) !important;
+  text-transform:uppercase; letter-spacing:.07em; font-weight:800;
+  border-radius: var(--radius) !important; box-shadow: var(--glow);
+  transition: all .2s ease;
+}
+.stButton > button:hover{
+  background: rgba(0,255,246,.12) !important; transform: translateY(-1px);
+}
+.stButton > button:active{ transform: translateY(0); filter: brightness(1.1); }
+
+/* ---------- INPUTS ---------- */
+input, textarea, select{
+  background: rgba(8,12,18,.85) !important;
+  color: var(--edex-fg) !important;
+  border:1px solid rgba(0,255,246,.25) !important;
+  border-radius:10px !important;
+}
+input:focus, textarea:focus, select:focus{
+  outline:none !important; box-shadow: 0 0 0 2px rgba(0,255,246,.35) !important;
 }
 
-/* Pulse */
-@keyframes pulse-glow { 0%,100%{ box-shadow:0 0 20px rgba(96,165,250,0.2);} 50%{ box-shadow:0 0 40px rgba(96,165,250,0.4);} }
+/* ---------- SLIDER ---------- */
+.stSlider [data-baseweb="slider"]{
+  height:8px !important; border-radius:10px;
+  background: linear-gradient(90deg, var(--edex-magenta), var(--edex-cyan), var(--edex-green)) !important;
+}
+
+/* ---------- ALERTAS ---------- */
+[data-testid="stAlert"]{
+  background: rgba(10,14,20,.65); border:1px solid rgba(0,255,246,.22);
+  border-left:4px solid var(--edex-cyan); border-radius: var(--radius);
+}
+
+/* ---------- TABLAS / DATAFRAME ---------- */
+[data-testid="stDataFrame"] .row-widget, .stDataFrame{ color: var(--edex-fg); }
+.stDataFrame table{ border:1px solid rgba(0,255,246,.18); }
+.stDataFrame thead tr{ background: rgba(0,255,246,.08); }
+.stDataFrame th, .stDataFrame td{ border-color: rgba(0,255,246,.12) !important; }
+
+/* ---------- DIVISORES / LINEAS ---------- */
+hr, .stDivider{
+  border: none; height:1px; background: linear-gradient(90deg, var(--edex-cyan), transparent);
+  box-shadow: var(--glow); opacity:.6; margin: .8rem 0 !important;
+}
+
+/* ---------- SCROLLBAR ---------- */
+::-webkit-scrollbar{ width:10px; height:10px; }
+::-webkit-scrollbar-track{ background: var(--edex-bg-2); }
+::-webkit-scrollbar-thumb{ background: linear-gradient(var(--edex-cyan), var(--edex-green)); border-radius:8px; }
+
+/* ---------- PULSE / DESTACADO ---------- */
+@keyframes pulse-glow { 0%,100%{ box-shadow:0 0 20px rgba(0,255,246,0.2);} 50%{ box-shadow:0 0 40px rgba(0,255,246,0.4);} }
 .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
 </style>
 """
-st.markdown(DARK_THEME_CSS, unsafe_allow_html=True)
+st.markdown(EDEX_UI_CSS, unsafe_allow_html=True)
+
+# (Opcional) Cargar tipografías monoespaciadas desde Google si _embed_font_css() no las incluye
+st.markdown("""
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+""", unsafe_allow_html=True)
+
+# Plotly template estilo EdeX-UI
+pio.templates["edex"] = go.layout.Template(
+    layout=go.Layout(
+        template="plotly_dark",
+        paper_bgcolor="#0a0e14",
+        plot_bgcolor="#0a0e14",
+        font=dict(family="Fira Code, Share Tech Mono, monospace", color="#00fff6"),
+        colorway=["#00fff6", "#00ffa3", "#7a7dff", "#f2d17a", "#ff5ea0"],
+        xaxis=dict(gridcolor="#121a25", zerolinecolor="#121a25", linecolor="rgba(0,255,246,.35)"),
+        yaxis=dict(gridcolor="#121a25", zerolinecolor="#121a25", linecolor="rgba(0,255,246,.35)"),
+        margin=dict(l=50, r=30, t=50, b=40)
+    )
+)
+pio.templates.default = "edex"
+
+# Matplotlib estilo EdeX-UI
+def apply_matplotlib_edex():
+    mpl.rcParams.update({
+        "figure.facecolor": "#0a0e14",
+        "axes.facecolor": "#0a0e14",
+        "savefig.facecolor": "#0a0e14",
+        "text.color": "#00fff6",
+        "axes.edgecolor": "rgba(0,255,246,0.6)",
+        "axes.labelcolor": "#00fff6",
+        "xtick.color": "#d7e2ec",
+        "ytick.color": "#d7e2ec",
+        "grid.color": "#121a25",
+        "grid.linestyle": "-",
+        "axes.grid": True,
+        "font.family": "monospace",
+        "font.monospace": ["Fira Code", "Share Tech Mono", "JetBrains Mono", "monospace"],
+        "axes.titleweight": "bold",
+        "axes.titlepad": 12,
+        "axes.titlecolor": "#00fff6",
+        "lines.linewidth": 2.0,
+    })
+apply_matplotlib_edex()
 
 # === Logo (Hexa.png) support ===
 BASE_DIR = Path(__file__).parent.resolve()
@@ -272,11 +372,11 @@ if logo_b64:
 # Header
 st.markdown("""
 <div style='text-align: center; padding: 2rem 0;'>
-    <h1 style='font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, #60A5FA 0%, #A78BFA 50%, #F472B6 100%); 
+    <h1 style='font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, #00fff6 0%, #00ffa3 50%, #f2d17a 100%); 
     -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem;'>
         AQUILA
     </h1>
-    <p style='font-size: 1.2rem; color: rgba(248, 250, 252, 0.7);'>
+    <p style='font-size: 1.2rem; color: rgba(215, 226, 236, 0.75);'>
         Sistema de Decisión de Riesgo Crediticio
     </p>
 </div>
@@ -309,8 +409,8 @@ if uploaded:
         with col2:
             st.markdown("""
             <div class='metric-card' style='text-align: center;'>
-                <div style='font-size: 2.5rem; font-weight: 800; color: #22C55E;'>✓</div>
-                <div style='font-size: 0.9rem; color: rgba(248, 250, 252, 0.7); margin-top: 0.5rem;'>
+                <div style='font-size: 2.5rem; font-weight: 800; color: #00ffa3;'>✓</div>
+                <div style='font-size: 0.9rem; color: rgba(215, 226, 236, 0.75); margin-top: 0.5rem;'>
                     Archivo cargado<br/>
                     <strong>{}</strong> clientes
                 </div>
@@ -380,10 +480,10 @@ if uploaded:
             tasa_anual_calc = to_annual_from_monthly(tasa_m_input)
             st.markdown(f"""
             <div class='metric-card'>
-                <div style='font-size: 0.85rem; color: rgba(248, 250, 252, 0.6); margin-bottom: 0.5rem;'>
+                <div style='font-size: 0.85rem; color: rgba(215, 226, 236, 0.7); margin-bottom: 0.5rem;'>
                     EQUIVALENTE ANUAL
                 </div>
-                <div style='font-size: 2rem; font-weight: 800; color: #A78BFA;'>
+                <div style='font-size: 2rem; font-weight: 800; color: #7a7dff;'>
                     {tasa_anual_calc*100:.2f}%
                 </div>
             </div>
@@ -464,7 +564,7 @@ if uploaded:
                     letter-spacing: 0.05em; text-transform: uppercase;'>
                     {decision_text}
                 </div>
-                <div style='font-size: 1.2rem; color: rgba(248, 250, 252, 0.8); margin-top: 1rem;'>
+                <div style='font-size: 1.2rem; color: rgba(215, 226, 236, 0.85); margin-top: 1rem;'>
                     Retorno Esperado: <strong style='color: {decision_color};'>{resultado["RE_anual_simple"]*100:.2f}%</strong>
                 </div>
             </div>
@@ -477,7 +577,7 @@ if uploaded:
             metrics_data = [
                 ("Probabilidad Default", f"{resultado['PD_12m']*100:.2f}%", "12 meses", "#EF4444", colm1),
                 ("LGD", f"{resultado['LGD']*100:.2f}%", "Loss Given Default", "#F59E0B", colm2),
-                ("Pérdida Dada Default", fmt_usd(resultado['PDD'], 0), "PDD", "#A78BFA", colm3),
+                ("Pérdida Dada Default", fmt_usd(resultado['PDD'], 0), "PDD", "#7a7dff", colm3),
                 ("Retorno Esperado", f"{resultado['RE_anual_simple']*100:.2f}%", "Anual", decision_color, colm4)
             ]
             
@@ -485,14 +585,14 @@ if uploaded:
                 with column:
                     st.markdown(f"""
                     <div class='metric-card' style='border-left: 4px solid {color};'>
-                        <div style='font-size: 0.85rem; color: rgba(248, 250, 252, 0.6); 
+                        <div style='font-size: 0.85rem; color: rgba(215, 226, 236, 0.7); 
                             text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;'>
                             {label}
                         </div>
                         <div style='font-size: 2rem; font-weight: 800; color: {color};'>
                             {value}
                         </div>
-                        <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5); margin-top: 0.3rem;'>
+                        <div style='font-size: 0.8rem; color: rgba(215, 226, 236, 0.6); margin-top: 0.3rem;'>
                             {subtitle}
                         </div>
                     </div>
@@ -567,14 +667,14 @@ if uploaded:
             with col_res1:
                 st.markdown(f"""
                 <div class='metric-card'>
-                    <div style='font-size: 0.85rem; color: rgba(248, 250, 252, 0.6); 
+                    <div style='font-size: 0.85rem; color: rgba(215, 226, 236, 0.7); 
                         text-transform: uppercase; margin-bottom: 0.5rem;'>
                         Garantía Bruta
                     </div>
-                    <div style='font-size: 2rem; font-weight: 800; color: #60A5FA;'>
+                    <div style='font-size: 2rem; font-weight: 800; color: #00fff6;'>
                         {fmt_usd(garantia_bruta_edit, 0)}
                     </div>
-                    <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5); margin-top: 0.3rem;'>
+                    <div style='font-size: 0.8rem; color: rgba(215, 226, 236, 0.6); margin-top: 0.3rem;'>
                         Valor Original
                     </div>
                 </div>
@@ -583,14 +683,14 @@ if uploaded:
             with col_res2:
                 st.markdown(f"""
                 <div class='metric-card'>
-                    <div style='font-size: 0.85rem; color: rgba(248, 250, 252, 0.6); 
+                    <div style='font-size: 0.85rem; color: rgba(215, 226, 236, 0.7); 
                         text-transform: uppercase; margin-bottom: 0.5rem;'>
                         Factor de Ajuste
                     </div>
-                    <div style='font-size: 2rem; font-weight:800; color: #A78BFA;'>
+                    <div style='font-size: 2rem; font-weight:800; color: #7a7dff;'>
                         {peso_garantia_edit:.2%}
                     </div>
-                    <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5); margin-top: 0.3rem;'>
+                    <div style='font-size: 0.8rem; color: rgba(215, 226, 236, 0.6); margin-top: 0.3rem;'>
                         Quality Collateral
                     </div>
                 </div>
@@ -599,14 +699,14 @@ if uploaded:
             with col_res3:
                 st.markdown(f"""
                 <div class='metric-card' style='border: 2px solid #22C55E;'>
-                    <div style='font-size: 0.85rem; color: rgba(248, 250, 252, 0.6); 
+                    <div style='font-size: 0.85rem; color: rgba(215, 226, 236, 0.7); 
                         text-transform: uppercase; margin-bottom: 0.5rem;'>
                         Garantía Castigada
                     </div>
                     <div style='font-size: 2rem; font-weight: 800; color: #22C55E;'>
                         {fmt_usd(garantia_castigada, 0)}
                     </div>
-                    <div style='font-size: 0.8rem; color: rgba(248, 250, 252, 0.5); margin-top: 0.3rem;'>
+                    <div style='font-size: 0.8rem; color: rgba(215, 226, 236, 0.6); margin-top: 0.3rem;'>
                         Valor Final
                     </div>
                 </div>
@@ -626,10 +726,8 @@ else:
 st.markdown("<br/><br/>", unsafe_allow_html=True)
 st.divider()
 st.markdown("""
-<div style='text-align: center; color: rgba(248, 250, 252, 0.5); font-size: 0.85rem;'>
-    <p>Aquila Risk Analysis System · Powered by Advanced Credit Modeling</p>
+<div style='text-align: center; color: rgba(215, 226, 236, 0.6); font-size: 0.85rem;'>
+    <p>Aquila Risk Analysis System · EdeX-UI Theme</p>
     <p>© 2025 Juan José Mostajo León · Version 6.6-AQ</p>
 </div>
 """, unsafe_allow_html=True)
-
-
