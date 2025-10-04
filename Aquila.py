@@ -336,6 +336,96 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# ===========================
+# AUTH GATE — Login + Welcome
+# ===========================
+def _hash(p: str) -> str:
+    return hashlib.sha256(p.encode("utf-8")).hexdigest()
+
+# Usuario de ejemplo (puedes añadir más)
+USERS = {
+    "pieroeghezzi@gmail.com": {
+        "name": "Piero",
+        "pass_hash": _hash("Aquila2025!")  # <-- cambia la clave aquí
+    }
+}
+
+def login_gate():
+    # Estados
+    if "auth" not in st.session_state:
+        st.session_state.auth = False
+    if "welcome_done" not in st.session_state:
+        st.session_state.welcome_done = False
+
+    # Si ya pasó todo, continuar
+    if st.session_state.auth and st.session_state.welcome_done:
+        return True
+
+    # Si no está autenticado, mostrar formulario
+    if not st.session_state.auth:
+        st.markdown("<div class='section-header-enhanced'>🔐 Acceso</div>", unsafe_allow_html=True)
+        with st.form("login_form", clear_on_submit=False):
+            email = st.text_input("Correo electrónico", key="login_email", autocomplete="email", placeholder="tucorreo@dominio.com")
+            password = st.text_input("Contraseña", type="password", key="login_password", placeholder="••••••••")
+            ok = st.form_submit_button("Entrar")
+
+        if ok:
+            user = USERS.get(email.strip().lower())
+            if user and _hash(password) == user["pass_hash"]:
+                st.session_state.auth = True
+                st.session_state.user_email = email.strip().lower()
+                st.session_state.user_name = user["name"]
+                # Marcar que debemos mostrar pantalla de bienvenida
+                st.session_state.show_welcome = True
+                st.rerun()
+            else:
+                st.error("Credenciales inválidas. Intenta nuevamente.")
+        st.stop()
+
+    # Si autenticó pero aún no mostramos la bienvenida, mostrarla
+    if st.session_state.auth and not st.session_state.welcome_done:
+        # Nombre a mostrar
+        email = st.session_state.get("user_email", "")
+        if email == "pieroeghezzi@gmail.com":
+            name = "Piero"
+        else:
+            # fallback: nombre a partir del correo (antes de @)
+            name = st.session_state.get("user_name") or (email.split("@")[0].replace(".", " ").title() if "@" in email else "Usuario")
+
+        st.markdown("""
+        <div class='metric-card' style='padding:2rem; text-align:center;'>
+            <div style='font-size:3rem; font-weight:900; color:#00ffa3; text-transform:uppercase; letter-spacing:.06em;'>
+                Bienvenido {}
+            </div>
+            <div style='margin-top:.75rem; color:rgba(215,226,236,.8)'>
+                Autenticación exitosa. Presiona el botón para ingresar a <strong>AQUILA</strong>.
+            </div>
+        </div>
+        """.format(name), unsafe_allow_html=True)
+
+        col_a, col_b, col_c = st.columns([1,1,1])
+        with col_b:
+            if st.button("🚀 Entrar a AQUILA", type="primary", use_container_width=True):
+                st.session_state.welcome_done = True
+                st.rerun()
+        st.stop()
+
+# Ejecutar el gate ANTES de construir el resto de la app
+login_gate()
+
+# ===========================
+# (Opcional) Logout en Sidebar
+# — Coloca esto dentro de tu with st.sidebar: existente
+# ===========================
+# with st.sidebar:
+#     if st.session_state.get("auth", False):
+#         st.caption(f"Usuario: {st.session_state.get('user_email','')}")
+#         if st.button("Cerrar sesión", use_container_width=True):
+#             for k in ["auth","user_email","user_name","welcome_done","show_welcome","tasa_aplicada","tc_ann_applied"]:
+#                 st.session_state.pop(k, None)
+#             st.rerun()
+
+
 # === Sidebar ===
 with st.sidebar:
     # Show your logo in the sidebar
