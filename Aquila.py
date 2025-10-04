@@ -27,13 +27,6 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 import base64  # for logo encoding
 # Agregar en la sección de imports al principio del archivo
-import base64
-from io import BytesIO
-try:
-    from gtts import gTTS
-except ImportError:
-    st.error("gTTS no está instalado. Ejecuta: pip install gtts")
-
 _embed_font_css()
 
 # ===========================
@@ -353,34 +346,63 @@ def _hash(p: str) -> str:
 UNIVERSAL_PASSWORD = "Aquila2025!"
 UNIVERSAL_PASSWORD_HASH = _hash(UNIVERSAL_PASSWORD)
 
-def text_to_speech_base64(text: str) -> str:
-    """Convierte texto a audio usando gTTS y retorna base64"""
-    try:
-        from gtts import gTTS
-        import base64
-        from io import BytesIO
-        
-        # Crear audio con gTTS
-        tts = gTTS(text=text, lang='es', slow=False)
-        audio_buffer = BytesIO()
-        tts.write_to_fp(audio_buffer)
-        audio_buffer.seek(0)
-        
-        # Convertir a base64
-        audio_b64 = base64.b64encode(audio_buffer.read()).decode()
-        return audio_b64
-    except Exception as e:
-        st.error(f"Error generando audio: {e}")
-        return ""
-
-def play_audio_from_base64(audio_b64: str):
-    """Reproduce audio desde base64"""
-    audio_html = f"""
-    <audio autoplay>
-        <source src="data:audio/mp3;base64,{audio_b64}" type="audio/mp3">
-    </audio>
+def play_futuristic_welcome(name: str):
+    """Reproduce bienvenida usando síntesis de voz del navegador"""
+    welcome_js = f"""
+    <script>
+        if ('speechSynthesis' in window) {{
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = "Bienvenido, {name}. Sistema AQUILA activado.";
+            msg.lang = 'es-ES';
+            msg.rate = 1.0;
+            msg.pitch = 1.2;
+            msg.volume = 0.8;
+            
+            // Voz más robótica
+            setTimeout(() => {{
+                window.speechSynthesis.speak(msg);
+            }}, 500);
+        }}
+    </script>
     """
-    st.components.v1.html(audio_html, height=0)
+    st.components.v1.html(welcome_js, height=0)
+
+def play_enter_sound():
+    """Sonido al entrar al dashboard"""
+    enter_js = """
+    <script>
+        if ('speechSynthesis' in window) {
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = "Acceso confirmado. Iniciando interfaz principal.";
+            msg.lang = 'es-ES';
+            msg.rate = 1.1;
+            msg.pitch = 1.1;
+            window.speechSynthesis.speak(msg);
+        }
+        
+        // Efecto de sonido adicional con Audio Context (más futurista)
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(880, audioContext.currentTime + 0.3);
+            
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+        } catch (e) {
+            console.log('Audio context no soportado');
+        }
+    </script>
+    """
+    st.components.v1.html(enter_js, height=0)
 
 def login_gate():
     # Estados
@@ -412,10 +434,6 @@ def login_gate():
                 # Extraer nombre del correo (parte antes del @)
                 name = email.split("@")[0].replace(".", " ").title()
                 st.session_state.user_name = name
-                
-                # Generar audio de bienvenida
-                welcome_text = f"Bienvenido, {name}. Sistema AQUILA activado. Iniciando análisis de riesgo."
-                st.session_state.welcome_audio = text_to_speech_base64(welcome_text)
                 st.session_state.audio_played = False
                 
                 st.rerun()
@@ -430,8 +448,8 @@ def login_gate():
         name = st.session_state.get("user_name", "Usuario")
 
         # Reproducir audio solo una vez
-        if not st.session_state.audio_played and st.session_state.get("welcome_audio"):
-            play_audio_from_base64(st.session_state.welcome_audio)
+        if not st.session_state.audio_played:
+            play_futuristic_welcome(name)
             st.session_state.audio_played = True
 
         st.markdown(f"""
@@ -440,7 +458,7 @@ def login_gate():
                 Bienvenido {name}
             </div>
             <div style='margin-top:.75rem; color:rgba(215,226,236,.8)'>
-                🔊 <em>Sistema AQUILA activado</em><br/>
+                🔊 <em>Sistema AQUILA activado - Voz sintetizada</em><br/>
                 Autenticación exitosa. Presiona el botón para ingresar al dashboard.
             </div>
         </div>
@@ -449,10 +467,7 @@ def login_gate():
         col_a, col_b, col_c = st.columns([1,1,1])
         with col_b:
             if st.button("🚀 Entrar a AQUILA", type="primary", use_container_width=True):
-                # Audio de confirmación al entrar
-                enter_audio = text_to_speech_base64("Acceso confirmado. Iniciando interfaz principal.")
-                play_audio_from_base64(enter_audio)
-                
+                play_enter_sound()
                 st.session_state.welcome_done = True
                 st.rerun()
         st.stop()
