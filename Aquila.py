@@ -352,54 +352,36 @@ def play_futuristic_welcome(name: str):
     <script>
         if ('speechSynthesis' in window) {{
             const msg = new SpeechSynthesisUtterance();
-            msg.text = "Welcome, {name}. AQUILA system activated.";
+            msg.text = "Welcome, {name}. AQUILA risk analysis system online.";
             msg.lang = 'en-US';
-            msg.rate = 1.0;
-            msg.pitch = 1.2;
-            msg.volume = 0.8;
+            msg.rate = 0.9;  // Slightly slower for professionalism
+            msg.pitch = 1.0;  // Normal pitch
+            msg.volume = 0.7;
             
-            // More robotic voice
+            // Professional delay
             setTimeout(() => {{
                 window.speechSynthesis.speak(msg);
-            }}, 500);
+            }}, 300);
         }}
     </script>
     """
     st.components.v1.html(welcome_js, height=0)
 
 def play_enter_sound():
-    """Sound when entering dashboard"""
+    """Professional sound when entering dashboard"""
     enter_js = """
     <script>
         if ('speechSynthesis' in window) {
             const msg = new SpeechSynthesisUtterance();
-            msg.text = "Access confirmed. Initializing main interface.";
+            msg.text = "Access granted. Loading risk assessment dashboard.";
             msg.lang = 'en-US';
-            msg.rate = 1.1;
-            msg.pitch = 1.1;
+            msg.rate = 0.9;
+            msg.pitch = 1.0;
+            msg.volume = 0.7;
             window.speechSynthesis.speak(msg);
         }
         
-        // Additional sound effect with Audio Context (more futuristic)
-        try {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
-            oscillator.frequency.exponentialRampToValueAtTime(880, audioContext.currentTime + 0.3);
-            
-            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.3);
-        } catch (e) {
-            console.log('Audio context not supported');
-        }
+        // Professional subtle sound effect - removed the game-like oscillator
     </script>
     """
     st.components.v1.html(enter_js, height=0)
@@ -419,11 +401,11 @@ def login_gate():
 
     # If not authenticated, show form
     if not st.session_state.auth:
-        st.markdown("<div class='section-header-enhanced'>🔐 Access</div>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header-enhanced'>🔐 System Access</div>", unsafe_allow_html=True)
         with st.form("login_form", clear_on_submit=False):
             email = st.text_input("Email", key="login_email", autocomplete="email", placeholder="your.email@domain.com")
             password = st.text_input("Password", type="password", key="login_password", placeholder="••••••••")
-            ok = st.form_submit_button("Enter")
+            ok = st.form_submit_button("Authenticate")
 
         if ok:
             # Verify any email + universal password
@@ -454,19 +436,21 @@ def login_gate():
 
         st.markdown(f"""
         <div class='metric-card' style='padding:2rem; text-align:center;'>
-            <div style='font-size:3rem; font-weight:900; color:#00ffa3; text-transform:uppercase; letter-spacing:.06em;'>
-                Welcome {name}
+            <div style='font-size:2.8rem; font-weight:800; color:#00ffa3; letter-spacing:.04em;'>
+                Welcome, {name}
             </div>
-            <div style='margin-top:.75rem; color:rgba(215,226,236,.8)'>
-                🔊 <em>AQUILA System Activated - Synthesized Voice</em><br/>
-                Authentication successful. Press the button to enter the dashboard.
+            <div style='margin-top:1rem; color:rgba(215,226,236,.8); font-size:1.1rem;'>
+                AQUILA Risk Analysis System · Online
+            </div>
+            <div style='margin-top:.75rem; color:rgba(215,226,236,.6); font-size:0.9rem;'>
+                Authentication successful. Ready to initialize credit risk assessment protocols.
             </div>
         </div>
         """, unsafe_allow_html=True)
 
         col_a, col_b, col_c = st.columns([1,1,1])
         with col_b:
-            if st.button("🚀 Enter AQUILA", type="primary", use_container_width=True):
+            if st.button("🔒 Initialize Dashboard", type="primary", use_container_width=True):
                 play_enter_sound()
                 st.session_state.welcome_done = True
                 st.rerun()
