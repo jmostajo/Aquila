@@ -342,23 +342,23 @@ st.set_page_config(
 def _hash(p: str) -> str:
     return hashlib.sha256(p.encode("utf-8")).hexdigest()
 
-# Contraseña universal para todos los usuarios
+# Universal password for all users
 UNIVERSAL_PASSWORD = "Aquila2025!"
 UNIVERSAL_PASSWORD_HASH = _hash(UNIVERSAL_PASSWORD)
 
 def play_futuristic_welcome(name: str):
-    """Reproduce bienvenida usando síntesis de voz del navegador"""
+    """Play welcome using browser speech synthesis in ENGLISH"""
     welcome_js = f"""
     <script>
         if ('speechSynthesis' in window) {{
             const msg = new SpeechSynthesisUtterance();
-            msg.text = "Bienvenido, {name}. Sistema AQUILA activado.";
-            msg.lang = 'es-ES';
+            msg.text = "Welcome, {name}. AQUILA system activated.";
+            msg.lang = 'en-US';
             msg.rate = 1.0;
             msg.pitch = 1.2;
             msg.volume = 0.8;
             
-            // Voz más robótica
+            // More robotic voice
             setTimeout(() => {{
                 window.speechSynthesis.speak(msg);
             }}, 500);
@@ -368,19 +368,19 @@ def play_futuristic_welcome(name: str):
     st.components.v1.html(welcome_js, height=0)
 
 def play_enter_sound():
-    """Sonido al entrar al dashboard"""
+    """Sound when entering dashboard"""
     enter_js = """
     <script>
         if ('speechSynthesis' in window) {
             const msg = new SpeechSynthesisUtterance();
-            msg.text = "Acceso confirmado. Iniciando interfaz principal.";
-            msg.lang = 'es-ES';
+            msg.text = "Access confirmed. Initializing main interface.";
+            msg.lang = 'en-US';
             msg.rate = 1.1;
             msg.pitch = 1.1;
             window.speechSynthesis.speak(msg);
         }
         
-        // Efecto de sonido adicional con Audio Context (más futurista)
+        // Additional sound effect with Audio Context (more futuristic)
         try {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioContext.createOscillator();
@@ -398,14 +398,14 @@ def play_enter_sound():
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + 0.3);
         } catch (e) {
-            console.log('Audio context no soportado');
+            console.log('Audio context not supported');
         }
     </script>
     """
     st.components.v1.html(enter_js, height=0)
 
 def login_gate():
-    # Estados
+    # States
     if "auth" not in st.session_state:
         st.session_state.auth = False
     if "welcome_done" not in st.session_state:
@@ -413,41 +413,41 @@ def login_gate():
     if "audio_played" not in st.session_state:
         st.session_state.audio_played = False
 
-    # Si ya pasó todo, continuar
+    # If everything passed, continue
     if st.session_state.auth and st.session_state.welcome_done:
         return True
 
-    # Si no está autenticado, mostrar formulario
+    # If not authenticated, show form
     if not st.session_state.auth:
-        st.markdown("<div class='section-header-enhanced'>🔐 Acceso</div>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header-enhanced'>🔐 Access</div>", unsafe_allow_html=True)
         with st.form("login_form", clear_on_submit=False):
-            email = st.text_input("Correo electrónico", key="login_email", autocomplete="email", placeholder="tucorreo@dominio.com")
-            password = st.text_input("Contraseña", type="password", key="login_password", placeholder="••••••••")
-            ok = st.form_submit_button("Entrar")
+            email = st.text_input("Email", key="login_email", autocomplete="email", placeholder="your.email@domain.com")
+            password = st.text_input("Password", type="password", key="login_password", placeholder="••••••••")
+            ok = st.form_submit_button("Enter")
 
         if ok:
-            # Verificar que se ingresó un correo (cualquiera) y la contraseña universal
+            # Verify any email + universal password
             if email.strip() and _hash(password) == UNIVERSAL_PASSWORD_HASH:
                 st.session_state.auth = True
                 st.session_state.user_email = email.strip().lower()
                 
-                # Extraer nombre del correo (parte antes del @)
+                # Extract name from email (part before @)
                 name = email.split("@")[0].replace(".", " ").title()
                 st.session_state.user_name = name
                 st.session_state.audio_played = False
                 
                 st.rerun()
             else:
-                st.error("Credenciales inválidas. Intenta nuevamente.")
+                st.error("Invalid credentials. Please try again.")
         st.stop()
 
-    # Si autenticó pero aún no mostramos la bienvenida, mostrarla
+    # If authenticated but welcome not shown yet, show it
     if st.session_state.auth and not st.session_state.welcome_done:
-        # Nombre a mostrar
+        # Name to display
         email = st.session_state.get("user_email", "")
-        name = st.session_state.get("user_name", "Usuario")
+        name = st.session_state.get("user_name", "User")
 
-        # Reproducir audio solo una vez
+        # Play audio only once
         if not st.session_state.audio_played:
             play_futuristic_welcome(name)
             st.session_state.audio_played = True
@@ -455,24 +455,24 @@ def login_gate():
         st.markdown(f"""
         <div class='metric-card' style='padding:2rem; text-align:center;'>
             <div style='font-size:3rem; font-weight:900; color:#00ffa3; text-transform:uppercase; letter-spacing:.06em;'>
-                Bienvenido {name}
+                Welcome {name}
             </div>
             <div style='margin-top:.75rem; color:rgba(215,226,236,.8)'>
-                🔊 <em>Sistema AQUILA activado - Voz sintetizada</em><br/>
-                Autenticación exitosa. Presiona el botón para ingresar al dashboard.
+                🔊 <em>AQUILA System Activated - Synthesized Voice</em><br/>
+                Authentication successful. Press the button to enter the dashboard.
             </div>
         </div>
         """, unsafe_allow_html=True)
 
         col_a, col_b, col_c = st.columns([1,1,1])
         with col_b:
-            if st.button("🚀 Entrar a AQUILA", type="primary", use_container_width=True):
+            if st.button("🚀 Enter AQUILA", type="primary", use_container_width=True):
                 play_enter_sound()
                 st.session_state.welcome_done = True
                 st.rerun()
         st.stop()
 
-# Ejecutar el gate ANTES de construir el resto de la app
+# Execute gate BEFORE building the rest of the app
 login_gate()
 # ===========================
 # (Opcional) Logout en Sidebar
