@@ -216,11 +216,11 @@ apply_matplotlib_edex()
 # === Logo (Hexa.png) support ===
 BASE_DIR = Path(__file__).parent.resolve()
 LOGO_CANDIDATES = [
-    Path.home() / "Desktop" / "Fly.png",   # Desktop
-    BASE_DIR / "Fly.png",                   # project root
-    BASE_DIR / "assets" / "Fly.png",
-    BASE_DIR / "static" / "Fly.png",
-    BASE_DIR / "images" / "Fly.png",
+    Path.home() / "Desktop" / "Hexa.png",   # Desktop
+    BASE_DIR / "Hexa.png",                   # project root
+    BASE_DIR / "assets" / "Hexa.png",
+    BASE_DIR / "static" / "Hexa.png",
+    BASE_DIR / "images" / "Hexa.png",
 ]
 
 def _first_existing(paths):
