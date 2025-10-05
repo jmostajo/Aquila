@@ -346,54 +346,12 @@ def _hash(p: str) -> str:
 UNIVERSAL_PASSWORD = "Aquila2025!"
 UNIVERSAL_PASSWORD_HASH = _hash(UNIVERSAL_PASSWORD)
 
-def play_futuristic_welcome(name: str):
-    """Play welcome using browser speech synthesis in ENGLISH"""
-    welcome_js = f"""
-    <script>
-        if ('speechSynthesis' in window) {{
-            const msg = new SpeechSynthesisUtterance();
-            msg.text = "Welcome, {name}. AQUILA risk analysis system online.";
-            msg.lang = 'en-US';
-            msg.rate = 0.9;  // Slightly slower for professionalism
-            msg.pitch = 1.0;  // Normal pitch
-            msg.volume = 0.7;
-            
-            // Professional delay
-            setTimeout(() => {{
-                window.speechSynthesis.speak(msg);
-            }}, 300);
-        }}
-    </script>
-    """
-    st.components.v1.html(welcome_js, height=0)
-
-def play_enter_sound():
-    """Professional sound when entering dashboard"""
-    enter_js = """
-    <script>
-        if ('speechSynthesis' in window) {
-            const msg = new SpeechSynthesisUtterance();
-            msg.text = "Access granted. Loading risk assessment dashboard.";
-            msg.lang = 'en-US';
-            msg.rate = 0.9;
-            msg.pitch = 1.0;
-            msg.volume = 0.7;
-            window.speechSynthesis.speak(msg);
-        }
-        
-        // Professional subtle sound effect - removed the game-like oscillator
-    </script>
-    """
-    st.components.v1.html(enter_js, height=0)
-
 def login_gate():
     # States
     if "auth" not in st.session_state:
         st.session_state.auth = False
     if "welcome_done" not in st.session_state:
         st.session_state.welcome_done = False
-    if "audio_played" not in st.session_state:
-        st.session_state.audio_played = False
 
     # If everything passed, continue
     if st.session_state.auth and st.session_state.welcome_done:
@@ -401,11 +359,25 @@ def login_gate():
 
     # If not authenticated, show form
     if not st.session_state.auth:
-        st.markdown("<div class='section-header-enhanced'>🔐 System Access</div>", unsafe_allow_html=True)
+        st.markdown("<div class='section-header-enhanced'>System Authentication</div>", unsafe_allow_html=True)
+        
         with st.form("login_form", clear_on_submit=False):
-            email = st.text_input("Email", key="login_email", autocomplete="email", placeholder="your.email@domain.com")
-            password = st.text_input("Password", type="password", key="login_password", placeholder="••••••••")
-            ok = st.form_submit_button("Authenticate")
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                email = st.text_input(
+                    "Email Address", 
+                    key="login_email", 
+                    autocomplete="email", 
+                    placeholder="your.email@domain.com"
+                )
+                password = st.text_input(
+                    "Password", 
+                    type="password", 
+                    key="login_password", 
+                    placeholder="Enter your password"
+                )
+                
+                ok = st.form_submit_button("Authenticate", use_container_width=True)
 
         if ok:
             # Verify any email + universal password
@@ -416,11 +388,10 @@ def login_gate():
                 # Extract name from email (part before @)
                 name = email.split("@")[0].replace(".", " ").title()
                 st.session_state.user_name = name
-                st.session_state.audio_played = False
                 
                 st.rerun()
             else:
-                st.error("Invalid credentials. Please try again.")
+                st.error("Invalid credentials. Please verify your email and password.")
         st.stop()
 
     # If authenticated but welcome not shown yet, show it
@@ -429,29 +400,25 @@ def login_gate():
         email = st.session_state.get("user_email", "")
         name = st.session_state.get("user_name", "User")
 
-        # Play audio only once
-        if not st.session_state.audio_played:
-            play_futuristic_welcome(name)
-            st.session_state.audio_played = True
-
         st.markdown(f"""
-        <div class='metric-card' style='padding:2rem; text-align:center;'>
-            <div style='font-size:2.8rem; font-weight:800; color:#00ffa3; letter-spacing:.04em;'>
+        <div class='metric-card' style='padding:3rem 2rem; text-align:center; border: 1px solid rgba(0, 255, 246, 0.3);'>
+            <div style='font-size:2.5rem; font-weight:700; color:#00ffa3; letter-spacing:.02em; margin-bottom:1.5rem;'>
+                Authentication Successful
+            </div>
+            <div style='font-size:1.5rem; color:rgba(215,226,236,.9); margin-bottom:2rem;'>
                 Welcome, {name}
             </div>
-            <div style='margin-top:1rem; color:rgba(215,226,236,.8); font-size:1.1rem;'>
-                AQUILA Risk Analysis System · Online
-            </div>
-            <div style='margin-top:.75rem; color:rgba(215,226,236,.6); font-size:0.9rem;'>
-                Authentication successful. Ready to initialize credit risk assessment protocols.
+            <div style='color:rgba(215,226,236,.7); font-size:1rem; line-height:1.6;'>
+                AQUILA Credit Risk Analysis System<br/>
+                You are now authorized to access the risk assessment dashboard
             </div>
         </div>
         """, unsafe_allow_html=True)
 
-        col_a, col_b, col_c = st.columns([1,1,1])
+        col_a, col_b, col_c = st.columns([1, 2, 1])
         with col_b:
-            if st.button("🔒 Initialize Dashboard", type="primary", use_container_width=True):
-                play_enter_sound()
+            st.markdown("<div style='height: 2rem;'></div>", unsafe_allow_html=True)
+            if st.button("Access Risk Dashboard", type="primary", use_container_width=True):
                 st.session_state.welcome_done = True
                 st.rerun()
         st.stop()
