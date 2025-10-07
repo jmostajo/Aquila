@@ -750,26 +750,6 @@ if uploaded:
                 </div>
                 """, unsafe_allow_html=True)
             
-            st.markdown("""
-            <div class='info-box' style='margin-top: 1.5rem;'>
-                <strong>💡 Guía de Interpretación y Uso:</strong><br/><br/>
-                
-                <strong style='color: #00fff6;'>📈 FORMA 1 (Valor Esperado):</strong><br/>
-                • <strong>Qué mide:</strong> Cuánto gano si me va bien vs cuánto pierdo si me va mal, multiplicado por probabilidades<br/>
-                • <strong>Interpretación:</strong> Por cada dólar de pérdida esperada, obtengo X dólares de retorno esperado<br/>
-                • <strong>Uso principal:</strong> <span style='color: #00ffa3;'>★ RANKING PRINCIPAL</span> - ordena créditos de mayor a menor ratio<br/>
-                • <strong>Umbrales:</strong> 5+ Excelente | 2+ Bueno | 1+ Aceptable | menos de 1 Evitar<br/><br/>
-                
-                <strong style='color: #7a7dff;'>⚠️ FORMA 2 (Escenario de Estrés):</strong><br/>
-                • <strong>Qué mide:</strong> Cuánto gano vs la pérdida total si efectivamente ocurre el default<br/>
-                • <strong>Interpretación:</strong> Por cada dólar que perdería en default, obtengo X dólares de retorno esperado<br/>
-                • <strong>Uso principal:</strong> <span style='color: #f2d17a;'>★ STRESS TEST</span> - validación de escenario adverso<br/>
-                • <strong>Umbrales:</strong> 1+ Excelente | 0.5+ Bueno | 0.25+ Aceptable | menos de 0.25 Riesgoso<br/><br/>
-                
-                <strong style='color: #00ffa3;'>🎯 Recomendación:</strong> Use <strong>Forma 1</strong> para rankear oportunidades, y <strong>Forma 2</strong> para validar que el crédito es sostenible incluso en escenarios adversos.
-            </div>
-            """, unsafe_allow_html=True)
-            
             # === MÉTRICAS CLAVE ===
             st.markdown("<br/><div class='section-header-enhanced'>📈 Métricas Clave de Riesgo</div>", unsafe_allow_html=True)
             
