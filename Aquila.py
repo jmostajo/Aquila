@@ -723,10 +723,10 @@ if uploaded:
             colm1, colm2, colm3, colm4 = st.columns(4)
             
             metrics_data = [
-                ("Probabilidad Default", f"{resultado['PD_12m']*100:.2f}%", "12 meses", "#ff5ea0", colm1),
+                ("PD", f"{resultado['PD_12m']*100:.2f}%", "Probabilidad Default 12m", "#ff5ea0", colm1),
                 ("LGD", f"{resultado['LGD']*100:.2f}%", "Loss Given Default", "#f2d17a", colm2),
-                ("Pérdida Esperada", fmt_usd(resultado['Perdida_Esperada'], 0), "PD × PDD", "#7a7dff", colm3),
-                ("Retorno Absoluto", fmt_usd(resultado['Retorno_Abs_Esperado'], 0), "USD Esperados", decision_color, colm4)
+                ("PDD", fmt_usd(resultado['PDD'], 0), "Pérdida Dada Default", "#7a7dff", colm3),
+                ("Retorno Esperado", f"{resultado['RE_anual_simple']*100:.2f}%", "Anualizado", decision_color, colm4)
             ]
             
             for label, value, subtitle, color, column in metrics_data:
