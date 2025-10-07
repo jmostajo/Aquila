@@ -446,11 +446,10 @@ if uploaded:
             <div class='metric-card' style='text-align: center;'>
                 <div style='font-size: 2.5rem; font-weight: 800; color: #00ffa3;'>✓</div>
                 <div style='font-size: 0.9rem; color: rgba(215, 226, 236, 0.75); margin-top: 0.5rem;'>
-                    Archivo cargado<br/>
-                    <strong>{}</strong> clientes
+                    Archivo cargado
                 </div>
             </div>
-            """.format(len(df_cart)), unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
         
         # === STEP 2: Client Selection ===
         st.markdown("<div class='section-header-enhanced'>👤 Paso 2: Seleccionar Cliente</div>", unsafe_allow_html=True)
@@ -659,8 +658,13 @@ if uploaded:
             
             st.markdown("""
             <div class='info-box'>
-                <strong>Concepto:</strong> El Sharpe Ratio adaptado mide cuánto ganamos si nos va bien versus cuánto perdemos si nos va mal.
-                <br/><strong>Uso:</strong> Permite rankear y comparar diferentes créditos. Mayor ratio = mejor perfil riesgo-retorno.
+                <strong>🎯 Propósito:</strong> El Sharpe Ratio crediticio mide la relación ganancia/pérdida para comparar y rankear diferentes oportunidades de crédito.
+                <br/><br/>
+                <strong>📐 Dos Enfoques Complementarios:</strong>
+                <ul style='margin-top: 0.5rem; margin-bottom: 0;'>
+                    <li><strong>Forma 1 (Con Probabilidades):</strong> Valor esperado real - considera la probabilidad de que el default ocurra</li>
+                    <li><strong>Forma 2 (Sin Probabilidades):</strong> Escenario de estrés - asume que el default efectivamente sucede</li>
+                </ul>
             </div>
             """, unsafe_allow_html=True)
             
@@ -668,52 +672,101 @@ if uploaded:
             
             with col_sr1:
                 sr_pe_display = f"{resultado['Sharpe_Ratio_PE']:.2f}" if np.isfinite(resultado['Sharpe_Ratio_PE']) else "∞"
-                sr_pe_quality = "🟢 Excelente" if resultado['Sharpe_Ratio_PE'] > 3 else "🟡 Bueno" if resultado['Sharpe_Ratio_PE'] > 1.5 else "🔴 Pobre"
+                sr_pe_quality = "🟢 Excelente" if resultado['Sharpe_Ratio_PE'] > 5 else "🟡 Bueno" if resultado['Sharpe_Ratio_PE'] > 2 else "🟠 Aceptable" if resultado['Sharpe_Ratio_PE'] > 1 else "🔴 Pobre"
                 
                 st.markdown(f"""
-                <div class='metric-card' style='border: 2px solid #00fff6;'>
-                    <div style='font-size: 0.85rem; color: rgba(215, 226, 236, 0.7); 
-                        text-transform: uppercase; margin-bottom: 0.5rem;'>
-                        Sharpe Ratio (Forma 1)
+                <div class='metric-card' style='border: 2px solid #00fff6; background: linear-gradient(135deg, rgba(0,255,246,0.12), rgba(0,255,246,0.05));'>
+                    <div style='font-size: 0.9rem; color: #00fff6; font-weight: 700;
+                        text-transform: uppercase; margin-bottom: 0.8rem; letter-spacing: 0.08em;'>
+                        📈 FORMA 1: Valor Esperado
                     </div>
-                    <div style='font-size: 2.5rem; font-weight: 800; color: #00fff6;'>
-                        {sr_pe_display}
+                    <div style='font-size: 3rem; font-weight: 900; color: #00fff6; line-height: 1;'>
+                        {sr_pe_display}×
                     </div>
-                    <div style='font-size: 0.85rem; color: rgba(215, 226, 236, 0.75); margin-top: 0.5rem;'>
-                        <strong>Fórmula:</strong> Retorno Esperado / Pérdida Esperada<br/>
-                        {fmt_usd(resultado["Retorno_Abs_Esperado"], 0)} / {fmt_usd(resultado["Perdida_Esperada"], 0)}<br/>
-                        <span style='color: #00ffa3;'>{sr_pe_quality}</span>
+                    <div style='font-size: 0.95rem; color: rgba(215, 226, 236, 0.85); margin-top: 1rem; 
+                        padding-top: 1rem; border-top: 1px solid rgba(0,255,246,0.2);'>
+                        <strong style='color: #00fff6;'>Fórmula:</strong><br/>
+                        Retorno Esperado ÷ Pérdida Esperada<br/>
+                        <span style='font-family: monospace; font-size: 0.85rem; color: rgba(215, 226, 236, 0.7);'>
+                        {fmt_usd(resultado["Retorno_Abs_Esperado"], 0)} ÷ {fmt_usd(resultado["Perdida_Esperada"], 0)}
+                        </span>
+                    </div>
+                    <div style='margin-top: 1rem; padding: 0.6rem; background: rgba(0,255,246,0.08); 
+                        border-radius: 8px; border-left: 3px solid #00fff6;'>
+                        <div style='font-size: 0.8rem; color: rgba(215, 226, 236, 0.7); margin-bottom: 0.3rem;'>
+                            <strong>📊 Incorpora Probabilidades:</strong>
+                        </div>
+                        <div style='font-size: 0.85rem; color: rgba(215, 226, 236, 0.9);'>
+                            • Pérdida Esperada = PD × PDD<br/>
+                            • PD = {resultado["PD_12m"]*100:.2f}% × PDD = {fmt_usd(resultado["PDD"], 0)}<br/>
+                            • <strong style='color: #00ffa3;'>Uso:</strong> Ranking principal de créditos
+                        </div>
+                    </div>
+                    <div style='margin-top: 1rem; text-align: center; font-size: 1.1rem; font-weight: 700;'>
+                        <span style='color: {"#00ffa3" if resultado['Sharpe_Ratio_PE'] > 2 else "#f2d17a" if resultado['Sharpe_Ratio_PE'] > 1 else "#ff5ea0"};'>
+                            {sr_pe_quality}
+                        </span>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
             
             with col_sr2:
                 sr_pdd_display = f"{resultado['Sharpe_Ratio_PDD']:.2f}" if np.isfinite(resultado['Sharpe_Ratio_PDD']) else "∞"
-                sr_pdd_quality = "🟢 Excelente" if resultado['Sharpe_Ratio_PDD'] > 1.5 else "🟡 Bueno" if resultado['Sharpe_Ratio_PDD'] > 0.75 else "🔴 Pobre"
+                sr_pdd_quality = "🟢 Excelente" if resultado['Sharpe_Ratio_PDD'] > 1 else "🟡 Bueno" if resultado['Sharpe_Ratio_PDD'] > 0.5 else "🟠 Aceptable" if resultado['Sharpe_Ratio_PDD'] > 0.25 else "🔴 Pobre"
                 
                 st.markdown(f"""
-                <div class='metric-card' style='border: 2px solid #7a7dff;'>
-                    <div style='font-size: 0.85rem; color: rgba(215, 226, 236, 0.7); 
-                        text-transform: uppercase; margin-bottom: 0.5rem;'>
-                        Sharpe Ratio (Forma 2)
+                <div class='metric-card' style='border: 2px solid #7a7dff; background: linear-gradient(135deg, rgba(122,125,255,0.12), rgba(122,125,255,0.05));'>
+                    <div style='font-size: 0.9rem; color: #7a7dff; font-weight: 700;
+                        text-transform: uppercase; margin-bottom: 0.8rem; letter-spacing: 0.08em;'>
+                        ⚠️ FORMA 2: Escenario de Estrés
                     </div>
-                    <div style='font-size: 2.5rem; font-weight: 800; color: #7a7dff;'>
-                        {sr_pdd_display}
+                    <div style='font-size: 3rem; font-weight: 900; color: #7a7dff; line-height: 1;'>
+                        {sr_pdd_display}×
                     </div>
-                    <div style='font-size: 0.85rem; color: rgba(215, 226, 236, 0.75); margin-top: 0.5rem;'>
-                        <strong>Fórmula:</strong> Retorno Esperado / PDD<br/>
-                        {fmt_usd(resultado["Retorno_Abs_Esperado"], 0)} / {fmt_usd(resultado["PDD"], 0)}<br/>
-                        <span style='color: #00ffa3;'>{sr_pdd_quality}</span>
+                    <div style='font-size: 0.95rem; color: rgba(215, 226, 236, 0.85); margin-top: 1rem;
+                        padding-top: 1rem; border-top: 1px solid rgba(122,125,255,0.2);'>
+                        <strong style='color: #7a7dff;'>Fórmula:</strong><br/>
+                        Retorno Esperado ÷ PDD<br/>
+                        <span style='font-family: monospace; font-size: 0.85rem; color: rgba(215, 226, 236, 0.7);'>
+                        {fmt_usd(resultado["Retorno_Abs_Esperado"], 0)} ÷ {fmt_usd(resultado["PDD"], 0)}
+                        </span>
+                    </div>
+                    <div style='margin-top: 1rem; padding: 0.6rem; background: rgba(122,125,255,0.08); 
+                        border-radius: 8px; border-left: 3px solid #7a7dff;'>
+                        <div style='font-size: 0.8rem; color: rgba(215, 226, 236, 0.7); margin-bottom: 0.3rem;'>
+                            <strong>⚡ Sin Probabilidades:</strong>
+                        </div>
+                        <div style='font-size: 0.85rem; color: rgba(215, 226, 236, 0.9);'>
+                            • PDD = LGD × EAD (pérdida si defaultea)<br/>
+                            • LGD = {resultado["LGD"]*100:.2f}% × EAD = {fmt_usd(EAD_sel, 0)}<br/>
+                            • <strong style='color: #f2d17a;'>Uso:</strong> Análisis conservador / peor caso
+                        </div>
+                    </div>
+                    <div style='margin-top: 1rem; text-align: center; font-size: 1.1rem; font-weight: 700;'>
+                        <span style='color: {"#00ffa3" if resultado['Sharpe_Ratio_PDD'] > 0.5 else "#f2d17a" if resultado['Sharpe_Ratio_PDD'] > 0.25 else "#ff5ea0"};'>
+                            {sr_pdd_quality}
+                        </span>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
             
             st.markdown("""
-            <div class='info-box' style='margin-top: 1rem;'>
-                <strong>💡 Interpretación:</strong><br/>
-                • <strong>Forma 1 (RE/Pérdida Esperada):</strong> Considera probabilidades de default. Más conservador.<br/>
-                • <strong>Forma 2 (RE/PDD):</strong> Considera pérdida potencial máxima. Análisis de escenario adverso.<br/>
-                • <strong>Para Ranking:</strong> Ordene créditos de mayor a menor Sharpe Ratio para priorizar mejores oportunidades.
+            <div class='info-box' style='margin-top: 1.5rem;'>
+                <strong>💡 Guía de Interpretación y Uso:</strong><br/><br/>
+                
+                <strong style='color: #00fff6;'>📈 FORMA 1 (Valor Esperado):</strong><br/>
+                • <strong>Qué mide:</strong> "Cuánto gano si me va bien vs cuánto pierdo si me va mal, multiplicado por probabilidades"<br/>
+                • <strong>Interpretación:</strong> Por cada dólar de pérdida esperada, obtengo X dólares de retorno esperado<br/>
+                • <strong>Uso principal:</strong> <span style='color: #00ffa3;'>★ RANKING PRINCIPAL</span> - ordena créditos de mayor a menor ratio<br/>
+                • <strong>Umbrales:</strong> >5 Excelente | >2 Bueno | >1 Aceptable | <1 Evitar<br/><br/>
+                
+                <strong style='color: #7a7dff;'>⚠️ FORMA 2 (Escenario de Estrés):</strong><br/>
+                • <strong>Qué mide:</strong> "Cuánto gano vs la pérdida total si efectivamente ocurre el default"<br/>
+                • <strong>Interpretación:</strong> Por cada dólar que perdería en default, obtengo X dólares de retorno esperado<br/>
+                • <strong>Uso principal:</strong> <span style='color: #f2d17a;'>★ STRESS TEST</span> - validación de escenario adverso<br/>
+                • <strong>Umbrales:</strong> >1 Excelente | >0.5 Bueno | >0.25 Aceptable | <0.25 Riesgoso<br/><br/>
+                
+                <strong style='color: #00ffa3;'>🎯 Recomendación:</strong> Use <strong>Forma 1</strong> para rankear oportunidades, y <strong>Forma 2</strong> para validar que el crédito es sostenible incluso en escenarios adversos.
             </div>
             """, unsafe_allow_html=True)
             
