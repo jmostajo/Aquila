@@ -252,7 +252,7 @@ logo_b64 = _img_to_base64(logo_img)
 # === end logo block ===
 
 # === Constantes y helpers ===
-APP_VERSION = "6.6-AQ"
+APP_VERSION = "6.7-AQ-SHARPE"
 CO_ANUAL_FIJO = 0.015
 TM_ANUAL_FIJO = 0.0075
 PD12_ANCLA_1, PD12_ANCLA_5 = 0.80, 0.05
@@ -313,6 +313,10 @@ def calcular_resultados_ejecutivo(
     PD2_cond = pd_hazard_months(lam, 3)
     LGD = lgd_politica(garantias_usd, EAD)
     PDD = LGD * EAD
+    
+    # Pérdida Esperada (Expected Loss) con probabilidad
+    Perdida_Esperada = PD_12m * PDD
+    
     tc_m = to_monthly(tc_ann)
     co_m = to_monthly(CO_ANUAL_FIJO)
     tm_m = to_monthly(TM_ANUAL_FIJO)
@@ -323,10 +327,33 @@ def calcular_resultados_ejecutivo(
     PV_t2_cura = CF_t2_cura / ((1 + co_m) ** 15)
     EV_VP = (1 - PD1) * PV_t1 + PD1 * ((1 - PD2_cond) * PV_t2_cura + PD2_cond * PV_t2_def)
     RE_anual_simple = tc_ann * (1 - PD_12m) - LGD * PD_12m
+    
+    # Retorno Absoluto Esperado en USD
+    Retorno_Abs_Esperado = EAD * RE_anual_simple
+    
+    # SHARPE RATIO ADAPTADO - DOS FORMAS:
+    # Forma 1: Retorno Esperado / Pérdida Esperada (con probabilidades)
+    Sharpe_Ratio_PE = Retorno_Abs_Esperado / Perdida_Esperada if Perdida_Esperada > 0 else np.inf
+    
+    # Forma 2: Retorno Esperado / PDD (pérdida potencial sin probabilidad)
+    Sharpe_Ratio_PDD = Retorno_Abs_Esperado / PDD if PDD > 0 else np.inf
+    
     Texp = 12.0 + PD1 * 3.0
     multiplo_vp = EV_VP / EAD if EAD > 0 else np.nan
-    return {"PD_12m": PD_12m, "LGD": LGD, "PDD": PDD, "RE_anual_simple": RE_anual_simple,
-            "EV_VP": EV_VP, "multiplo_vp": multiplo_vp, "Texp": Texp}
+    
+    return {
+        "PD_12m": PD_12m, 
+        "LGD": LGD, 
+        "PDD": PDD, 
+        "Perdida_Esperada": Perdida_Esperada,
+        "RE_anual_simple": RE_anual_simple,
+        "Retorno_Abs_Esperado": Retorno_Abs_Esperado,
+        "Sharpe_Ratio_PE": Sharpe_Ratio_PE,
+        "Sharpe_Ratio_PDD": Sharpe_Ratio_PDD,
+        "EV_VP": EV_VP, 
+        "multiplo_vp": multiplo_vp, 
+        "Texp": Texp
+    }
 
 # === Page config ===
 st.set_page_config(
@@ -335,19 +362,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-
-# ===========================
-# (Opcional) Logout en Sidebar
-# — Coloca esto dentro de tu with st.sidebar: existente
-# ===========================
-# with st.sidebar:
-#     if st.session_state.get("auth", False):
-#         st.caption(f"Usuario: {st.session_state.get('user_email','')}")
-#         if st.button("Cerrar sesión", use_container_width=True):
-#             for k in ["auth","user_email","user_name","welcome_done","show_welcome","tasa_aplicada","tc_ann_applied"]:
-#                 st.session_state.pop(k, None)
-#             st.rerun()
-
 
 # === Sidebar ===
 with st.sidebar:
@@ -360,11 +374,20 @@ with st.sidebar:
     st.caption("Análisis de Riesgo Crediticio Inteligente")
     st.divider()
     
+    st.markdown("#### 🎯 Umbrales de Tolerancia")
+    
     RET_THRESHOLD = st.number_input(
-        "Umbral de Retorno Mínimo",
-        min_value=0.0, max_value=1.0,
-        value=0.12, step=0.01, format="%.2f",
-        help="Retorno esperado mínimo para aprobar (12% default)"
+        "Retorno Mínimo (%)",
+        min_value=0.0, max_value=100.0,
+        value=12.0, step=0.5, format="%.2f",
+        help="Retorno esperado mínimo para aprobar"
+    ) / 100.0
+    
+    PDD_THRESHOLD = st.number_input(
+        "PDD Máximo (USD)",
+        min_value=0.0, max_value=10_000_000.0,
+        value=2_000_000.0, step=100_000.0, format="%.0f",
+        help="Pérdida Dada Default máxima tolerable"
     )
     
     st.divider()
@@ -389,7 +412,7 @@ st.markdown("""
         AQUILA
     </h1>
     <p style='font-size: 1.2rem; color: rgba(215, 226, 236, 0.75);'>
-        Sistema de Decisión de Riesgo Crediticio
+        Sistema de Decisión de Riesgo Crediticio con Sharpe Ratio
     </p>
 </div>
 """, unsafe_allow_html=True)
@@ -555,12 +578,17 @@ if uploaded:
                     gastos_usd=gastos_sel
                 )
             
-            decision_ok = resultado["RE_anual_simple"] >= RET_THRESHOLD
+            # VALIDACIONES: Retorno y PDD
+            decision_retorno_ok = resultado["RE_anual_simple"] >= RET_THRESHOLD
+            decision_pdd_ok = resultado["PDD"] <= PDD_THRESHOLD
+            decision_final_ok = decision_retorno_ok and decision_pdd_ok
             
             st.markdown("<br/>", unsafe_allow_html=True)
-            decision_color = "#00ffa3" if decision_ok else "#ff5ea0"
-            decision_icon = "✅" if decision_ok else "⛔"
-            decision_text = "APROBAR CRÉDITO" if decision_ok else "RECHAZAR CRÉDITO"
+            
+            # === DECISIÓN FINAL ===
+            decision_color = "#00ffa3" if decision_final_ok else "#ff5ea0"
+            decision_icon = "✅" if decision_final_ok else "⛔"
+            decision_text = "APROBAR CRÉDITO" if decision_final_ok else "RECHAZAR CRÉDITO"
             
             st.markdown(f"""
             <div class='metric-card pulse-glow' style='
@@ -568,8 +596,8 @@ if uploaded:
                 padding: 3rem 2rem; 
                 border: 3px solid {decision_color};
                 background: linear-gradient(135deg, 
-                    rgba({'0, 255, 163' if decision_ok else '255, 94, 160'}, 0.15) 0%, 
-                    rgba({'0, 255, 163' if decision_ok else '255, 94, 160'}, 0.05) 100%);
+                    rgba({'0, 255, 163' if decision_final_ok else '255, 94, 160'}, 0.15) 0%, 
+                    rgba({'0, 255, 163' if decision_final_ok else '255, 94, 160'}, 0.05) 100%);
             '>
                 <div style='font-size: 4rem; margin-bottom: 1rem;'>{decision_icon}</div>
                 <div style='font-size: 2.5rem; font-weight: 900; color: {decision_color}; 
@@ -577,20 +605,128 @@ if uploaded:
                     {decision_text}
                 </div>
                 <div style='font-size: 1.2rem; color: rgba(215, 226, 236, 0.85); margin-top: 1rem;'>
-                    Retorno Esperado: <strong style='color: {decision_color};'>{resultado["RE_anual_simple"]*100:.2f}%</strong>
+                    Retorno Esperado: <strong style='color: {"#00ffa3" if decision_retorno_ok else "#ff5ea0"};'>{resultado["RE_anual_simple"]*100:.2f}%</strong>
+                    {'✓' if decision_retorno_ok else '✗'}<br/>
+                    PDD: <strong style='color: {"#00ffa3" if decision_pdd_ok else "#ff5ea0"};'>{fmt_usd(resultado["PDD"], 0)}</strong>
+                    {'✓' if decision_pdd_ok else '✗'}
                 </div>
             </div>
             """, unsafe_allow_html=True)
             
-            st.markdown("<br/><div class='section-header-enhanced'>📈 Métricas Clave</div>", unsafe_allow_html=True)
+            # === MÉTRICAS DE VALIDACIÓN ===
+            st.markdown("<br/><div class='section-header-enhanced'>✅ Validación de Umbrales</div>", unsafe_allow_html=True)
+            
+            col_val1, col_val2 = st.columns(2)
+            
+            with col_val1:
+                ret_status = "✓ APROBADO" if decision_retorno_ok else "✗ RECHAZADO"
+                ret_color = "#00ffa3" if decision_retorno_ok else "#ff5ea0"
+                st.markdown(f"""
+                <div class='metric-card' style='border-left: 4px solid {ret_color};'>
+                    <div style='font-size: 0.85rem; color: rgba(215, 226, 236, 0.7); 
+                        text-transform: uppercase; margin-bottom: 0.5rem;'>
+                        Retorno Esperado vs Umbral
+                    </div>
+                    <div style='font-size: 1.8rem; font-weight: 800; color: {ret_color};'>
+                        {resultado["RE_anual_simple"]*100:.2f}% {ret_status}
+                    </div>
+                    <div style='font-size: 0.9rem; color: rgba(215, 226, 236, 0.6); margin-top: 0.3rem;'>
+                        Umbral mínimo: {RET_THRESHOLD*100:.2f}%
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with col_val2:
+                pdd_status = "✓ APROBADO" if decision_pdd_ok else "✗ RECHAZADO"
+                pdd_color = "#00ffa3" if decision_pdd_ok else "#ff5ea0"
+                st.markdown(f"""
+                <div class='metric-card' style='border-left: 4px solid {pdd_color};'>
+                    <div style='font-size: 0.85rem; color: rgba(215, 226, 236, 0.7); 
+                        text-transform: uppercase; margin-bottom: 0.5rem;'>
+                        PDD vs Umbral
+                    </div>
+                    <div style='font-size: 1.8rem; font-weight: 800; color: {pdd_color};'>
+                        {fmt_usd(resultado["PDD"], 0)} {pdd_status}
+                    </div>
+                    <div style='font-size: 0.9rem; color: rgba(215, 226, 236, 0.6); margin-top: 0.3rem;'>
+                        Umbral máximo: {fmt_usd(PDD_THRESHOLD, 0)}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            # === SHARPE RATIO - SECCIÓN DESTACADA ===
+            st.markdown("<br/><div class='section-header-enhanced'>📊 Sharpe Ratio Crediticio — Ranking de Créditos</div>", unsafe_allow_html=True)
+            
+            st.markdown("""
+            <div class='info-box'>
+                <strong>Concepto:</strong> El Sharpe Ratio adaptado mide cuánto ganamos si nos va bien versus cuánto perdemos si nos va mal.
+                <br/><strong>Uso:</strong> Permite rankear y comparar diferentes créditos. Mayor ratio = mejor perfil riesgo-retorno.
+            </div>
+            """, unsafe_allow_html=True)
+            
+            col_sr1, col_sr2 = st.columns(2)
+            
+            with col_sr1:
+                sr_pe_display = f"{resultado['Sharpe_Ratio_PE']:.2f}" if np.isfinite(resultado['Sharpe_Ratio_PE']) else "∞"
+                sr_pe_quality = "🟢 Excelente" if resultado['Sharpe_Ratio_PE'] > 3 else "🟡 Bueno" if resultado['Sharpe_Ratio_PE'] > 1.5 else "🔴 Pobre"
+                
+                st.markdown(f"""
+                <div class='metric-card' style='border: 2px solid #00fff6;'>
+                    <div style='font-size: 0.85rem; color: rgba(215, 226, 236, 0.7); 
+                        text-transform: uppercase; margin-bottom: 0.5rem;'>
+                        Sharpe Ratio (Forma 1)
+                    </div>
+                    <div style='font-size: 2.5rem; font-weight: 800; color: #00fff6;'>
+                        {sr_pe_display}
+                    </div>
+                    <div style='font-size: 0.85rem; color: rgba(215, 226, 236, 0.75); margin-top: 0.5rem;'>
+                        <strong>Fórmula:</strong> Retorno Esperado / Pérdida Esperada<br/>
+                        {fmt_usd(resultado["Retorno_Abs_Esperado"], 0)} / {fmt_usd(resultado["Perdida_Esperada"], 0)}<br/>
+                        <span style='color: #00ffa3;'>{sr_pe_quality}</span>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with col_sr2:
+                sr_pdd_display = f"{resultado['Sharpe_Ratio_PDD']:.2f}" if np.isfinite(resultado['Sharpe_Ratio_PDD']) else "∞"
+                sr_pdd_quality = "🟢 Excelente" if resultado['Sharpe_Ratio_PDD'] > 1.5 else "🟡 Bueno" if resultado['Sharpe_Ratio_PDD'] > 0.75 else "🔴 Pobre"
+                
+                st.markdown(f"""
+                <div class='metric-card' style='border: 2px solid #7a7dff;'>
+                    <div style='font-size: 0.85rem; color: rgba(215, 226, 236, 0.7); 
+                        text-transform: uppercase; margin-bottom: 0.5rem;'>
+                        Sharpe Ratio (Forma 2)
+                    </div>
+                    <div style='font-size: 2.5rem; font-weight: 800; color: #7a7dff;'>
+                        {sr_pdd_display}
+                    </div>
+                    <div style='font-size: 0.85rem; color: rgba(215, 226, 236, 0.75); margin-top: 0.5rem;'>
+                        <strong>Fórmula:</strong> Retorno Esperado / PDD<br/>
+                        {fmt_usd(resultado["Retorno_Abs_Esperado"], 0)} / {fmt_usd(resultado["PDD"], 0)}<br/>
+                        <span style='color: #00ffa3;'>{sr_pdd_quality}</span>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            st.markdown("""
+            <div class='info-box' style='margin-top: 1rem;'>
+                <strong>💡 Interpretación:</strong><br/>
+                • <strong>Forma 1 (RE/Pérdida Esperada):</strong> Considera probabilidades de default. Más conservador.<br/>
+                • <strong>Forma 2 (RE/PDD):</strong> Considera pérdida potencial máxima. Análisis de escenario adverso.<br/>
+                • <strong>Para Ranking:</strong> Ordene créditos de mayor a menor Sharpe Ratio para priorizar mejores oportunidades.
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # === MÉTRICAS CLAVE ===
+            st.markdown("<br/><div class='section-header-enhanced'>📈 Métricas Clave de Riesgo</div>", unsafe_allow_html=True)
             
             colm1, colm2, colm3, colm4 = st.columns(4)
             
             metrics_data = [
                 ("Probabilidad Default", f"{resultado['PD_12m']*100:.2f}%", "12 meses", "#ff5ea0", colm1),
                 ("LGD", f"{resultado['LGD']*100:.2f}%", "Loss Given Default", "#f2d17a", colm2),
-                ("Pérdida Dada Default", fmt_usd(resultado['PDD'], 0), "PDD", "#7a7dff", colm3),
-                ("Retorno Esperado", f"{resultado['RE_anual_simple']*100:.2f}%", "Anual", decision_color, colm4)
+                ("Pérdida Esperada", fmt_usd(resultado['Perdida_Esperada'], 0), "PD × PDD", "#7a7dff", colm3),
+                ("Retorno Absoluto", fmt_usd(resultado['Retorno_Abs_Esperado'], 0), "USD Esperados", decision_color, colm4)
             ]
             
             for label, value, subtitle, color, column in metrics_data:
@@ -739,7 +875,7 @@ st.markdown("<br/><br/>", unsafe_allow_html=True)
 st.divider()
 st.markdown("""
 <div style='text-align: center; color: rgba(215, 226, 236, 0.6); font-size: 0.85rem;'>
-    <p>Aquila Risk Analysis System · EdeX-UI Theme</p>
-    <p>© 2025 Juan José Mostajo León · Version 6.6-AQ</p>
+    <p>Aquila Risk Analysis System · EdeX-UI Theme · Con Sharpe Ratio Crediticio</p>
+    <p>© 2025 Juan José Mostajo León · Version 6.7-AQ-SHARPE</p>
 </div>
 """, unsafe_allow_html=True)
